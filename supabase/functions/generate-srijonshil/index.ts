@@ -10,8 +10,8 @@ serve(async (req) => {
 
   try {
     const { subject, uddipok } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const GEMINI_API_KEY = Deno.env.get("VITE_GEMINI_API_KEY");
+    if (!GEMINI_API_KEY) throw new Error("VITE_GEMINI_API_KEY not configured");
 
     const systemPrompt = `তুমি বাংলাদেশের HSC পরীক্ষার সৃজনশীল প্রশ্নের উত্তর লেখার বিশেষজ্ঞ।
 NCTB HSC পাঠ্যক্রম অনুযায়ী উত্তর তৈরি করো।
@@ -20,57 +20,42 @@ NCTB HSC পাঠ্যক্রম অনুযায়ী উত্তর �
 - খ) অনুধাবন: ধারণাটি নিজের ভাষায় ব্যাখ্যা, উদ্দীপকের সাথে সংযোগ
 - গ) প্রয়োগ: উদ্দীপকের ঘটনা পাঠ্যপুস্তকের তত্ত্বের আলোকে বিশ্লেষণ
 - ঘ) উচ্চতর দক্ষতা: গভীর বিশ্লেষণ, দুটি দিক থেকে মতামত, নিজস্ব মন্তব্য
-শুধু বাংলায় লেখো। Board পরীক্ষার ভাষা ও style follow করো।`;
+শুধু বাংলায় লেখো। Board পরীক্ষার ভাষা ও style follow করো।
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: `বিষয়: ${subject}\nউদ্দীপক: ${uddipok}\n\nসৃজনশীল উত্তর তৈরি করো।` },
-        ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "return_srijonshil_answer",
-            description: "Return structured creative answer",
-            parameters: {
-              type: "object",
-              properties: {
-                ka: { type: "string", description: "জ্ঞান (Knowledge) answer" },
-                kha: { type: "string", description: "অনুধাবন (Comprehension) answer" },
-                ga: { type: "string", description: "প্রয়োগ (Application) answer" },
-                gha: { type: "string", description: "উচ্চতর দক্ষতা (Higher Order) answer" },
-              },
-              required: ["ka", "kha", "ga", "gha"],
-            },
+Return JSON format: {"ka": "...", "kha": "...", "ga": "...", "gha": "..."}`;
+
+    const userMessage = `বিষয়: ${subject}\nউদ্দীপক: ${uddipok}\n\nসৃজনশীল উত্তর তৈরি করো।`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [{ role: "user", parts: [{ text: userMessage }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
           },
-        }],
-        tool_choice: { type: "function", function: { name: "return_srijonshil_answer" } },
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
       if (response.status === 429) return new Response(JSON.stringify({ error: "Rate limited" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (response.status === 402) return new Response(JSON.stringify({ error: "Credits exhausted" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error(`AI error: ${response.status}`);
+      const errText = await response.text();
+      console.error("Gemini API error:", response.status, errText);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (toolCall) {
-      const parsed = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify(parsed), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("No response from Gemini");
 
-    throw new Error("No tool call in response");
+    const parsed = JSON.parse(text);
+    return new Response(JSON.stringify(parsed), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("generate-srijonshil error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
