@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ type MCQQuestion = {
 
 const MCQPage: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -76,7 +78,6 @@ const MCQPage: React.FC = () => {
       setSelectedAnswer(null);
       setShowExplanation(false);
     } catch (err) {
-      // Fallback: generate sample questions
       const sampleQs: MCQQuestion[] = Array.from({ length: questionCount }, (_, i) => ({
         question: `${subjectName} - ${topicName} থেকে নমুনা প্রশ্ন ${i + 1}`,
         options: [
@@ -121,7 +122,6 @@ const MCQPage: React.FC = () => {
     const pct = (score / questions.length) * 100;
 
     if (profile) {
-      // Save session
       await supabase.from('mcq_sessions').insert({
         user_id: profile.id,
         subject_id: selectedSubject,
@@ -131,7 +131,6 @@ const MCQPage: React.FC = () => {
         score_percentage: pct,
       });
 
-      // Update daily count
       const today = new Date().toISOString().split('T')[0];
       const resetNeeded = profile.last_reset_date < today;
       await supabase.from('profiles').update({
@@ -142,11 +141,19 @@ const MCQPage: React.FC = () => {
     }
   };
 
+  const handleDeepExplain = () => {
+    const topicName = topics.find(t => t.id === selectedTopic)?.name_bn || '';
+    const subjectName = subjects.find(s => s.id === selectedSubject)?.name_bn || '';
+    const query = topicName || subjectName || questions[currentQ]?.question?.slice(0, 60) || '';
+    navigate(`/explain?topic=${encodeURIComponent(query)}`);
+  };
+
   if (step === 'quiz' && questions.length > 0) {
     const q = questions[currentQ];
     const correctIdx = q.options.findIndex(o => o.isCorrect);
+    const isWrong = selectedAnswer !== null && !q.options[selectedAnswer].isCorrect;
     return (
-      <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0">
+      <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
         {/* Progress */}
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">প্রশ্ন {currentQ + 1}/{questions.length}</span>
@@ -163,17 +170,23 @@ const MCQPage: React.FC = () => {
             <div className="space-y-3">
               {q.options.map((opt, idx) => {
                 const labels = ['ক', 'খ', 'গ', 'ঘ'];
-                let bg = 'bg-muted hover:bg-muted/80';
+                let bg = 'bg-muted hover:bg-muted/80 card-hover';
+                let bounceClass = '';
                 if (selectedAnswer !== null) {
-                  if (idx === correctIdx) bg = 'bg-success/20 border-success';
-                  else if (idx === selectedAnswer && !opt.isCorrect) bg = 'bg-destructive/20 border-destructive';
+                  if (idx === correctIdx) {
+                    bg = 'bg-success/20 border-success';
+                    bounceClass = 'animate-answer-bounce';
+                  } else if (idx === selectedAnswer && !opt.isCorrect) {
+                    bg = 'bg-destructive/20 border-destructive';
+                    bounceClass = 'animate-answer-bounce';
+                  }
                 }
                 return (
                   <button
                     key={idx}
                     onClick={() => handleAnswer(idx)}
                     disabled={selectedAnswer !== null}
-                    className={`w-full text-left p-4 rounded-lg border transition-colors ${bg}`}
+                    className={`w-full text-left p-4 rounded-lg border transition-colors ${bg} ${bounceClass}`}
                   >
                     <span className="font-semibold mr-2">{labels[idx]})</span>
                     {opt.text}
@@ -187,16 +200,26 @@ const MCQPage: React.FC = () => {
 
         {/* Explanation */}
         {showExplanation && (
-          <Card className="border-primary/30">
+          <Card className="border-primary/30 animate-fade-in">
             <CardContent className="p-4">
               <p className="text-sm font-semibold mb-1">📖 ব্যাখ্যা:</p>
               <p className="text-sm text-muted-foreground">{q.explanation}</p>
+              {isWrong && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 btn-ripple"
+                  onClick={handleDeepExplain}
+                >
+                  💡 বিস্তারিত বুঝতে চাই
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
 
         {selectedAnswer !== null && (
-          <Button className="w-full" onClick={nextQuestion}>
+          <Button className="w-full btn-ripple" onClick={nextQuestion}>
             {currentQ + 1 >= questions.length ? 'ফলাফল দেখো' : 'পরের প্রশ্ন →'}
           </Button>
         )}
@@ -207,8 +230,8 @@ const MCQPage: React.FC = () => {
   if (step === 'result') {
     const pct = Math.round((score / questions.length) * 100);
     return (
-      <div className="max-w-md mx-auto text-center space-y-6 pb-20 md:pb-0">
-        <Card>
+      <div className="max-w-md mx-auto text-center space-y-6 pb-20 md:pb-0 animate-fade-in">
+        <Card className="card-hover">
           <CardContent className="p-8">
             <div className="text-6xl mb-4">{pct >= 70 ? '🎉' : pct >= 40 ? '👍' : '💪'}</div>
             <h2 className="text-2xl font-bold mb-2">তোমার স্কোর</h2>
@@ -217,10 +240,10 @@ const MCQPage: React.FC = () => {
           </CardContent>
         </Card>
         <div className="flex gap-3">
-          <Button className="flex-1" onClick={() => { setStep('select'); setQuestions([]); }}>
+          <Button className="flex-1 btn-ripple" onClick={() => { setStep('select'); setQuestions([]); }}>
             অন্য বিষয় পড়ো
           </Button>
-          <Button variant="outline" className="flex-1" onClick={startQuiz}>
+          <Button variant="outline" className="flex-1 btn-ripple" onClick={startQuiz}>
             আবার চেষ্টা করো
           </Button>
         </div>
@@ -229,7 +252,7 @@ const MCQPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0">
+    <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
       <h2 className="text-2xl font-bold">📝 MCQ অনুশীলন</h2>
       <p className="text-muted-foreground">বিষয় ও অধ্যায় বেছে নিয়ে MCQ প্র্যাক্টিস শুরু করো</p>
 
@@ -241,7 +264,7 @@ const MCQPage: React.FC = () => {
             <button
               key={s.id}
               onClick={() => { setSelectedSubject(s.id); setSelectedTopic(null); }}
-              className={`p-4 rounded-xl border text-left transition-all ${
+              className={`p-4 rounded-xl border text-left transition-all card-hover ${
                 selectedSubject === s.id
                   ? 'bg-primary text-primary-foreground border-primary shadow-lg'
                   : 'bg-card border-border hover:border-primary/50'
@@ -263,7 +286,7 @@ const MCQPage: React.FC = () => {
               <button
                 key={t.id}
                 onClick={() => setSelectedTopic(t.id)}
-                className={`w-full p-3 rounded-lg border text-left transition-all ${
+                className={`w-full p-3 rounded-lg border text-left transition-all card-hover ${
                   selectedTopic === t.id
                     ? 'bg-primary text-primary-foreground border-primary'
                     : 'bg-card border-border hover:border-primary/50'
@@ -286,6 +309,7 @@ const MCQPage: React.FC = () => {
                 key={n}
                 variant={questionCount === n ? 'default' : 'outline'}
                 onClick={() => setQuestionCount(n)}
+                className="btn-ripple"
               >
                 {n}টি
               </Button>
@@ -295,7 +319,7 @@ const MCQPage: React.FC = () => {
       )}
 
       {selectedSubject && (
-        <Button className="w-full" size="lg" onClick={startQuiz} disabled={loading}>
+        <Button className="w-full btn-ripple" size="lg" onClick={startQuiz} disabled={loading}>
           {loading ? <ThinkingDots /> : 'শুরু করো 🚀'}
         </Button>
       )}

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +10,17 @@ import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
 
 const ExplainPage: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
+  const [searchParams] = useSearchParams();
   const [topic, setTopic] = useState('');
   const [level, setLevel] = useState<'easy' | 'medium' | 'detailed'>('medium');
   const [explanation, setExplanation] = useState('');
   const [loading, setLoading] = useState(false);
   const [showUpgrade, setShowUpgrade] = useState(false);
+
+  useEffect(() => {
+    const prefilled = searchParams.get('topic');
+    if (prefilled) setTopic(prefilled);
+  }, [searchParams]);
 
   const handleExplain = async () => {
     if (!topic.trim()) return;
