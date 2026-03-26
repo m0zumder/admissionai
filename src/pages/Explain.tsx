@@ -21,10 +21,6 @@ const ExplainPage: React.FC = () => {
     const prefilled = searchParams.get('topic');
     if (prefilled) setTopic(prefilled);
   }, [searchParams]);
-  const [level, setLevel] = useState<'easy' | 'medium' | 'detailed'>('medium');
-  const [explanation, setExplanation] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleExplain = async () => {
     if (!topic.trim()) return;
