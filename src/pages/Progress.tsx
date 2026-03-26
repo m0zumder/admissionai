@@ -116,6 +116,28 @@ const ProgressPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Mock Exam Score Trend */}
+      {scoreTrend.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">📈 পরীক্ষার স্কোর ট্রেন্ড</CardTitle></CardHeader>
+          <CardContent>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={scoreTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(v: number) => `${v}%`} />
+                  <Legend />
+                  <Area type="monotone" dataKey="score" name="স্কোর" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} strokeWidth={2} dot={{ r: 3 }} />
+                  <Area type="monotone" dataKey="avg" name="গড়" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" fillOpacity={0.1} strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Radar chart */}
       {subjectData.length > 0 && (
         <Card>
