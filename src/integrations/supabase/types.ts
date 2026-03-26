@@ -119,6 +119,54 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          bank_tran_id: string | null
+          card_type: string | null
+          created_at: string
+          currency: string
+          id: string
+          payment_method: string | null
+          plan: string
+          status: string
+          tran_id: string
+          updated_at: string
+          user_id: string
+          val_id: string | null
+        }
+        Insert: {
+          amount: number
+          bank_tran_id?: string | null
+          card_type?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_method?: string | null
+          plan: string
+          status?: string
+          tran_id: string
+          updated_at?: string
+          user_id: string
+          val_id?: string | null
+        }
+        Update: {
+          amount?: number
+          bank_tran_id?: string | null
+          card_type?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_method?: string | null
+          plan?: string
+          status?: string
+          tran_id?: string
+          updated_at?: string
+          user_id?: string
+          val_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           class_level: string | null
