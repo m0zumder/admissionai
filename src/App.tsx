@@ -46,6 +46,7 @@ const App = () => (
             <Route path="/progress" element={<DashboardRoute><Progress /></DashboardRoute>} />
             <Route path="/pricing" element={<DashboardRoute><Pricing /></DashboardRoute>} />
             <Route path="/settings" element={<DashboardRoute><Settings /></DashboardRoute>} />
+            <Route path="/notebook" element={<DashboardRoute><Notebook /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
