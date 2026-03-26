@@ -57,6 +57,7 @@ const LandingPage: React.FC = () => {
             AI দিয়ে পড়াশোনা <br />
             <span className="text-primary">এখন সহজ</span>
           </h1>
+          <p className="text-sm font-medium tracking-widest uppercase text-primary/70 mb-3">Smart Learning, Simplified Prep</p>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
           </p>
@@ -164,6 +165,7 @@ const LandingPage: React.FC = () => {
         <div className="container mx-auto px-4 text-center">
           <img src={logo} alt="Admission AI" className="h-12 w-12 rounded-full mx-auto mb-3" />
           <p className="text-xl font-bold mb-2">Admission AI</p>
+          <p className="text-sm opacity-70 mb-2">Smart Learning, Simplified Prep</p>
           <p className="text-sm opacity-70 mb-4">বাংলাদেশের শিক্ষার্থীদের জন্য AI-powered শিক্ষা প্ল্যাটফর্ম</p>
           <p className="text-xs opacity-50">© 2026 Admission AI. All rights reserved Mozlish Studio.</p>
         </div>
