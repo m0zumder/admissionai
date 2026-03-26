@@ -318,7 +318,7 @@ const MockExamPage: React.FC = () => {
             <h2 className="text-2xl font-bold mb-4">পরীক্ষার ফলাফল</h2>
             <p className="text-5xl font-bold text-primary mb-2">{pct}%</p>
             <div className="flex justify-center gap-6 mt-4 text-sm">
-              <div className="flex items-center gap-1.5 text-green-600">
+              <div className="flex items-center gap-1.5 text-primary">
                 <CheckCircle className="h-4 w-4" /> সঠিক: {correct}
               </div>
               <div className="flex items-center gap-1.5 text-destructive">
@@ -342,7 +342,7 @@ const MockExamPage: React.FC = () => {
             const labels = ['ক', 'খ', 'গ', 'ঘ'];
 
             return (
-              <Card key={i} className={`border-l-4 ${isCorrect ? 'border-l-green-500' : isSkipped ? 'border-l-muted-foreground' : 'border-l-destructive'}`}>
+              <Card key={i} className={`border-l-4 ${isCorrect ? 'border-l-primary' : isSkipped ? 'border-l-muted-foreground' : 'border-l-destructive'}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Badge variant="outline" className="shrink-0 mt-0.5">{i + 1}</Badge>
@@ -350,13 +350,13 @@ const MockExamPage: React.FC = () => {
                       <p className="font-medium text-sm">{q.question}</p>
                       <div className="text-xs space-y-1">
                         {isSkipped ? (
-                          <p className="text-muted-foreground">⏭️ উত্তর দেওয়া হয়নি — সঠিক: <span className="font-semibold text-green-600">{labels[correctIdx]}) {q.options[correctIdx].text}</span></p>
+                          <p className="text-muted-foreground">⏭️ উত্তর দেওয়া হয়নি — সঠিক: <span className="font-semibold text-primary">{labels[correctIdx]}) {q.options[correctIdx].text}</span></p>
                         ) : isCorrect ? (
-                          <p className="text-green-600">✅ তোমার উত্তর সঠিক: {labels[userAns!]}) {q.options[userAns!].text}</p>
+                          <p className="text-primary">✅ তোমার উত্তর সঠিক: {labels[userAns!]}) {q.options[userAns!].text}</p>
                         ) : (
                           <>
                             <p className="text-destructive">❌ তোমার উত্তর: {labels[userAns!]}) {q.options[userAns!].text}</p>
-                            <p className="text-green-600">✅ সঠিক উত্তর: {labels[correctIdx]}) {q.options[correctIdx].text}</p>
+                            <p className="text-primary">✅ সঠিক উত্তর: {labels[correctIdx]}) {q.options[correctIdx].text}</p>
                           </>
                         )}
                       </div>
