@@ -16,6 +16,7 @@ import MockExam from "./pages/MockExam";
 import Progress from "./pages/Progress";
 import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
+import Notebook from "./pages/Notebook";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/progress" element={<DashboardRoute><Progress /></DashboardRoute>} />
             <Route path="/pricing" element={<DashboardRoute><Pricing /></DashboardRoute>} />
             <Route path="/settings" element={<DashboardRoute><Settings /></DashboardRoute>} />
+            <Route path="/notebook" element={<DashboardRoute><Notebook /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
