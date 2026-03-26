@@ -118,6 +118,7 @@ const SettingsPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      <Card>
         <CardHeader><CardTitle>অ্যাকাউন্ট</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <Button variant="outline" className="w-full" onClick={signOut}>
