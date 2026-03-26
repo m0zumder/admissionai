@@ -108,7 +108,7 @@ const PricingPage: React.FC = () => {
             <p className="font-semibold mb-2">💳 পেমেন্ট পদ্ধতি</p>
             <p className="text-sm text-muted-foreground mb-4">bKash / Nagad / Card দিয়ে পেমেন্ট করুন</p>
             <a
-              href="https://wa.me/8801XXXXXXXXX"
+              href="https://wa.me/8801609059992"
               target="_blank"
               rel="noopener noreferrer"
             >
