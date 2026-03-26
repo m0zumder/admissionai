@@ -29,12 +29,12 @@ const MCQPage: React.FC = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
+  const classLevel = profile?.class_level || 'SSC';
+
   useEffect(() => {
-    if (profile?.class_level) {
-      supabase.from('subjects').select('*').eq('class_level', profile.class_level)
-        .then(({ data }) => setSubjects(data || []));
-    }
-  }, [profile]);
+    supabase.from('subjects').select('*').eq('class_level', classLevel)
+      .then(({ data }) => setSubjects(data || []));
+  }, [classLevel]);
 
   useEffect(() => {
     if (selectedSubject) {
@@ -66,7 +66,7 @@ const MCQPage: React.FC = () => {
         body: {
           subject: subjectName,
           topic: topicName,
-          classLevel: profile?.class_level || 'SSC',
+          classLevel,
           count: questionCount,
         },
       });
