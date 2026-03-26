@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, Legend, Area, AreaChart } from 'recharts';
+import { format, subDays, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
@@ -12,6 +13,7 @@ const ProgressPage: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [subjectData, setSubjectData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
+  const [scoreTrend, setScoreTrend] = useState<any[]>([]);
 
   useEffect(() => {
     if (!profile) return;
@@ -48,9 +50,23 @@ const ProgressPage: React.FC = () => {
       })));
     }
 
-    // Weekly data
-    const days = ['শনি', 'রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র'];
-    setWeeklyData(days.map((d) => ({ day: d, mcq: Math.floor(Math.random() * 25) })));
+      // Weekly activity from real data
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const date = subDays(new Date(), 6 - i);
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const dayLabel = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'][date.getDay()];
+        const daySessions = sessions.filter(s => s.created_at.startsWith(dateStr));
+        return { day: dayLabel, mcq: daySessions.reduce((a, s) => a + s.questions_attempted, 0) };
+      });
+      setWeeklyData(last7Days);
+
+      // Score trend over time (all sessions chronologically)
+      const sorted = [...sessions].sort((a, b) => a.created_at.localeCompare(b.created_at));
+      setScoreTrend(sorted.map((s, i) => ({
+        label: format(parseISO(s.created_at), 'dd/MM'),
+        score: Math.round(s.score_percentage),
+        avg: Math.round(sorted.slice(0, i + 1).reduce((a, x) => a + x.score_percentage, 0) / (i + 1)),
+      })));
 
     // Weak topics
     const { data: weak } = await supabase
@@ -99,6 +115,28 @@ const ProgressPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Mock Exam Score Trend */}
+      {scoreTrend.length > 0 && (
+        <Card>
+          <CardHeader><CardTitle className="text-lg">📈 পরীক্ষার স্কোর ট্রেন্ড</CardTitle></CardHeader>
+          <CardContent>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={scoreTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(v: number) => `${v}%`} />
+                  <Legend />
+                  <Area type="monotone" dataKey="score" name="স্কোর" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} strokeWidth={2} dot={{ r: 3 }} />
+                  <Area type="monotone" dataKey="avg" name="গড়" stroke="hsl(var(--secondary))" fill="hsl(var(--secondary))" fillOpacity={0.1} strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Radar chart */}
       {subjectData.length > 0 && (
