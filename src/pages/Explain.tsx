@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
-import ReactMarkdown from 'react-markdown';
+
 
 const ExplainPage: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
