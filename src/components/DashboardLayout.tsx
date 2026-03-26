@@ -18,6 +18,7 @@ const navItems = [
   { title: 'MCQ অনুশীলন', url: '/mcq', icon: BookOpen },
   { title: 'বুঝিয়ে দাও', url: '/explain', icon: Lightbulb },
   { title: 'সৃজনশীল', url: '/srijonshil', icon: PenTool },
+  { title: 'নোটবুক', url: '/notebook', icon: FileText },
   { title: 'মক পরীক্ষা', url: '/mock-exam', icon: FileText },
   { title: 'প্রগ্রেস', url: '/progress', icon: BarChart3 },
   { title: 'প্রাইসিং', url: '/pricing', icon: CreditCard },

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,116 +8,101 @@ import { Upload, FileText, MessageCircle, BookOpen, Trash2, Send, Loader2, Spark
 import { useToast } from '@/hooks/use-toast';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
-type DocFile = {
-  id: string;
-  file_name: string;
-  file_path: string;
-  file_type: string;
-  file_size: number;
-  created_at: string;
-};
+type LocalDoc = { id: string; name: string; content: string; size: number; addedAt: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notebook-chat`;
 
 const NotebookPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [documents, setDocuments] = useState<DocFile[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [documents, setDocuments] = useState<LocalDoc[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [studyGuide, setStudyGuide] = useState('');
   const [isGeneratingGuide, setIsGeneratingGuide] = useState(false);
   const [activeTab, setActiveTab] = useState('documents');
+  const [uploading, setUploading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (user) loadDocuments();
-  }, [user]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  const loadDocuments = async () => {
-    const { data } = await supabase
-      .from('notebook_documents')
-      .select('*')
-      .eq('user_id', user!.id)
-      .order('created_at', { ascending: false });
-    if (data) setDocuments(data as DocFile[]);
+  const readFileAsText = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      if (file.type.startsWith('image/')) {
+        // For images, we'll just note the filename
+        resolve(`[ছবি: ${file.name}]`);
+      } else {
+        reader.readAsText(file);
+      }
+    });
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || !user) return;
-
+    if (!files) return;
     setUploading(true);
+
     try {
       for (const file of Array.from(files)) {
-        if (file.size > 20 * 1024 * 1024) {
-          toast({ title: 'ফাইল খুব বড়', description: 'সর্বোচ্চ ২০MB সাইজের ফাইল আপলোড করা যাবে।', variant: 'destructive' });
+        if (file.size > 5 * 1024 * 1024) {
+          toast({ title: 'ফাইল খুব বড়', description: 'সর্বোচ্চ ৫MB সাইজের ফাইল আপলোড করা যাবে।', variant: 'destructive' });
           continue;
         }
-
-        const filePath = `${user.id}/${Date.now()}_${file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('notebooks')
-          .upload(filePath, file);
-
-        if (uploadError) {
-          toast({ title: 'আপলোড ব্যর্থ', description: uploadError.message, variant: 'destructive' });
-          continue;
-        }
-
-        await supabase.from('notebook_documents').insert({
-          user_id: user.id,
-          file_name: file.name,
-          file_path: filePath,
-          file_type: file.type,
-          file_size: file.size,
-        });
+        const content = await readFileAsText(file);
+        const doc: LocalDoc = {
+          id: crypto.randomUUID(),
+          name: file.name,
+          content: content.slice(0, 50000), // limit context
+          size: file.size,
+          addedAt: new Date().toISOString(),
+        };
+        setDocuments((prev) => [doc, ...prev]);
       }
-
-      await loadDocuments();
-      toast({ title: 'আপলোড সফল! ✅', description: 'ডকুমেন্ট সফলভাবে আপলোড হয়েছে।' });
-    } catch (err) {
-      toast({ title: 'ত্রুটি', description: 'আপলোডে সমস্যা হয়েছে।', variant: 'destructive' });
+      toast({ title: 'ডকুমেন্ট যোগ হয়েছে ✅' });
+    } catch {
+      toast({ title: 'ত্রুটি', description: 'ফাইল পড়তে সমস্যা হয়েছে।', variant: 'destructive' });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const handleDelete = async (doc: DocFile) => {
-    await supabase.storage.from('notebooks').remove([doc.file_path]);
-    await supabase.from('notebook_documents').delete().eq('id', doc.id);
-    setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
-    toast({ title: 'ডকুমেন্ট মুছে ফেলা হয়েছে।' });
+  const handleDelete = (id: string) => {
+    setDocuments((prev) => prev.filter((d) => d.id !== id));
   };
 
   const getDocumentContext = () => {
     if (documents.length === 0) return '';
-    return `শিক্ষার্থী ${documents.length}টি ডকুমেন্ট আপলোড করেছে: ${documents.map((d) => d.file_name).join(', ')}। এই ডকুমেন্টগুলোর বিষয়বস্তু নিয়ে আলোচনা করো।`;
+    return documents.map((d) => `--- ${d.name} ---\n${d.content}`).join('\n\n');
   };
 
-  const streamChat = async (msgs: ChatMessage[], onDelta: (t: string) => void, onDone: () => void) => {
+  const streamChat = async (
+    msgs: ChatMessage[],
+    mode: string,
+    onDelta: (t: string) => void,
+    onDone: () => void,
+  ) => {
     const resp = await fetch(CHAT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: msgs, documentContext: getDocumentContext(), mode: 'chat' }),
+      body: JSON.stringify({ messages: msgs, documentContext: getDocumentContext(), mode }),
     });
 
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
       throw new Error(errData.error || 'চ্যাট ত্রুটি');
     }
-    if (!resp.body) throw new Error('No stream body');
+    if (!resp.body) throw new Error('No stream');
 
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
@@ -141,7 +125,7 @@ const NotebookPage: React.FC = () => {
           const parsed = JSON.parse(json);
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) onDelta(content);
-        } catch { /* partial */ }
+        } catch { /* partial JSON */ }
       }
     }
     onDone();
@@ -155,11 +139,11 @@ const NotebookPage: React.FC = () => {
     setIsChatLoading(true);
 
     let assistantText = '';
-    const allMsgs = [...chatMessages, userMsg];
 
     try {
       await streamChat(
-        allMsgs,
+        [...chatMessages, userMsg],
+        'chat',
         (chunk) => {
           assistantText += chunk;
           setChatMessages((prev) => {
@@ -180,7 +164,7 @@ const NotebookPage: React.FC = () => {
 
   const generateStudyGuide = async () => {
     if (documents.length === 0) {
-      toast({ title: 'ডকুমেন্ট নেই', description: 'প্রথমে একটি ডকুমেন্ট আপলোড করুন।', variant: 'destructive' });
+      toast({ title: 'ডকুমেন্ট নেই', description: 'প্রথমে ডকুমেন্ট আপলোড করুন।', variant: 'destructive' });
       return;
     }
     setIsGeneratingGuide(true);
@@ -188,7 +172,8 @@ const NotebookPage: React.FC = () => {
 
     try {
       await streamChat(
-        [{ role: 'user', content: 'আমার আপলোড করা ডকুমেন্টগুলোর উপর ভিত্তি করে একটি বিস্তারিত স্টাডি গাইড তৈরি করো।' }],
+        [{ role: 'user', content: 'আমার আপলোড করা ডকুমেন্টগুলোর উপর ভিত্তি করে একটি বিস্তারিত স্টাডি গাইড তৈরি করো। গুরুত্বপূর্ণ বিষয়, সারসংক্ষেপ এবং সম্ভাব্য পরীক্ষার প্রশ্ন অন্তর্ভুক্ত করো।' }],
+        'study-guide',
         (chunk) => setStudyGuide((prev) => prev + chunk),
         () => setIsGeneratingGuide(false),
       );
@@ -206,9 +191,7 @@ const NotebookPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">📓 আমার নোটবুক</h2>
-      </div>
+      <h2 className="text-2xl font-bold">📓 আমার নোটবুক</h2>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
@@ -223,7 +206,6 @@ const NotebookPage: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Documents Tab */}
         <TabsContent value="documents" className="space-y-4">
           <Card className="card-hover">
             <CardContent className="p-6">
@@ -233,19 +215,19 @@ const NotebookPage: React.FC = () => {
               >
                 <Upload className="h-10 w-10 mx-auto mb-3 text-primary/60" />
                 <p className="font-semibold text-sm">ডকুমেন্ট আপলোড করুন</p>
-                <p className="text-xs text-muted-foreground mt-1">PDF, ছবি বা টেক্সট ফাইল (সর্বোচ্চ ২০MB)</p>
+                <p className="text-xs text-muted-foreground mt-1">টেক্সট ফাইল (.txt, .md) সর্বোচ্চ ৫MB</p>
                 <input
                   ref={fileInputRef}
                   type="file"
                   className="hidden"
                   multiple
-                  accept=".pdf,.png,.jpg,.jpeg,.txt,.doc,.docx"
+                  accept=".txt,.md,.csv,.json"
                   onChange={handleUpload}
                 />
                 {uploading && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-primary">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm">আপলোড হচ্ছে...</span>
+                    <span className="text-sm">পড়া হচ্ছে...</span>
                   </div>
                 )}
               </div>
@@ -270,17 +252,15 @@ const NotebookPage: React.FC = () => {
                         <FileText className="h-5 w-5 text-primary" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{doc.file_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatSize(doc.file_size)} · {new Date(doc.created_at).toLocaleDateString('bn-BD')}
-                        </p>
+                        <p className="font-medium text-sm truncate">{doc.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatSize(doc.size)}</p>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="shrink-0 text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(doc)}
+                      onClick={() => handleDelete(doc.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -291,7 +271,6 @@ const NotebookPage: React.FC = () => {
           )}
         </TabsContent>
 
-        {/* Chat Tab */}
         <TabsContent value="chat" className="space-y-4">
           <Card className="card-hover">
             <CardContent className="p-0">
@@ -341,7 +320,6 @@ const NotebookPage: React.FC = () => {
           </Card>
         </TabsContent>
 
-        {/* Study Guide Tab */}
         <TabsContent value="guide" className="space-y-4">
           <Card className="card-hover">
             <CardHeader>
@@ -360,15 +338,9 @@ const NotebookPage: React.FC = () => {
                 className="btn-ripple w-full"
               >
                 {isGeneratingGuide ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    তৈরি হচ্ছে...
-                  </>
+                  <><Loader2 className="h-4 w-4 animate-spin" /> তৈরি হচ্ছে...</>
                 ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    স্টাডি গাইড তৈরি করো
-                  </>
+                  <><Sparkles className="h-4 w-4" /> স্টাডি গাইড তৈরি করো</>
                 )}
               </Button>
 
