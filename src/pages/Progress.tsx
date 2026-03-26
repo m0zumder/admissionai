@@ -50,9 +50,23 @@ const ProgressPage: React.FC = () => {
       })));
     }
 
-    // Weekly data
-    const days = ['শনি', 'রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র'];
-    setWeeklyData(days.map((d) => ({ day: d, mcq: Math.floor(Math.random() * 25) })));
+      // Weekly activity from real data
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const date = subDays(new Date(), 6 - i);
+        const dateStr = format(date, 'yyyy-MM-dd');
+        const dayLabel = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'][date.getDay()];
+        const daySessions = sessions.filter(s => s.created_at.startsWith(dateStr));
+        return { day: dayLabel, mcq: daySessions.reduce((a, s) => a + s.questions_attempted, 0) };
+      });
+      setWeeklyData(last7Days);
+
+      // Score trend over time (all sessions chronologically)
+      const sorted = [...sessions].sort((a, b) => a.created_at.localeCompare(b.created_at));
+      setScoreTrend(sorted.map((s, i) => ({
+        label: format(parseISO(s.created_at), 'dd/MM'),
+        score: Math.round(s.score_percentage),
+        avg: Math.round(sorted.slice(0, i + 1).reduce((a, x) => a + x.score_percentage, 0) / (i + 1)),
+      })));
 
     // Weak topics
     const { data: weak } = await supabase
