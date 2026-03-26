@@ -18,6 +18,8 @@ import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
 import Notebook from "./pages/Notebook";
 import Leaderboard from "./pages/Leaderboard";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentFail from "./pages/PaymentFail";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
