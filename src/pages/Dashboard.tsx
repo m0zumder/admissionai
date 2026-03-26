@@ -1,11 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Target, AlertTriangle, Flame } from 'lucide-react';
+import { BookOpen, Target, AlertTriangle, Flame, Lightbulb } from 'lucide-react';
+
+const STUDY_TIPS = [
+  "📌 প্রতিদিন অন্তত ৩০ মিনিট MCQ অনুশীলন করো — ধারাবাহিকতাই সাফল্যের চাবিকাঠি।",
+  "🧠 একটি topic পড়ার পর সাথে সাথে MCQ দাও — এতে মনে থাকবে বেশি।",
+  "📝 ভুল উত্তরগুলো নোট করো এবং পরদিন আবার চেষ্টা করো।",
+  "⏰ পরীক্ষার আগে নতুন কিছু না পড়ে, আগেরগুলো revision দাও।",
+  "🎯 দুর্বল বিষয়ে বেশি সময় দাও — সেখানেই marks বাড়বে।",
+  "💡 সৃজনশীল প্রশ্নে উদ্দীপকের সাথে পাঠ্যপুস্তকের তত্ত্ব মেলাও।",
+  "📖 প্রতিটি অধ্যায়ের শুরুতে summary পড়ে নাও — পুরো ছবি বুঝতে পারবে।",
+  "🔄 Spaced Repetition: আজ পড়লে ৩ দিন পর আবার পড়ো, তারপর ৭ দিন পর।",
+  "✍️ নিজে নোট তৈরি করো — পড়ার চেয়ে লেখায় মনে বেশি থাকে।",
+  "🏆 ছোট ছোট লক্ষ্য সেট করো: আজ ১০টি MCQ, কাল ১৫টি।",
+];
 
 const DashboardPage: React.FC = () => {
   const { profile } = useAuth();
@@ -13,13 +26,17 @@ const DashboardPage: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
 
+  const todayTip = useMemo(() => {
+    const dayIndex = Math.floor(Date.now() / 86400000) % STUDY_TIPS.length;
+    return STUDY_TIPS[dayIndex];
+  }, []);
+
   useEffect(() => {
     if (!profile) return;
     loadData();
   }, [profile]);
 
   const loadData = async () => {
-    // Recent sessions
     const { data: sessions } = await supabase
       .from('mcq_sessions')
       .select('*, subjects(name_bn)')
@@ -28,7 +45,6 @@ const DashboardPage: React.FC = () => {
       .limit(5);
     setRecentSessions(sessions || []);
 
-    // Weak topics
     const { data: weak } = await supabase
       .from('weak_topics')
       .select('*, topics(name_bn)')
@@ -37,7 +53,6 @@ const DashboardPage: React.FC = () => {
       .limit(3);
     setWeakTopics(weak || []);
 
-    // Weekly data (mock for now)
     const days = ['শনি', 'রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র'];
     setWeeklyData(days.map((d) => ({ day: d, mcq: Math.floor(Math.random() * 20) })));
   };
@@ -46,12 +61,25 @@ const DashboardPage: React.FC = () => {
   const mcqDone = profile?.daily_mcq_count || 0;
 
   return (
-    <div className="space-y-6 pb-20 md:pb-0">
+    <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
       <h2 className="text-2xl font-bold">স্বাগতম, {profile?.name || 'শিক্ষার্থী'} 👋</h2>
+
+      {/* Tip of the Day */}
+      <Card className="card-hover border-secondary/30 bg-secondary/5">
+        <CardContent className="p-4 flex items-start gap-3">
+          <div className="p-2 rounded-lg bg-secondary/10 shrink-0">
+            <Lightbulb className="h-5 w-5 text-secondary" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-secondary mb-1">আজকের পরামর্শ</p>
+            <p className="text-sm">{todayTip}</p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+        <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10"><BookOpen className="h-5 w-5 text-primary" /></div>
             <div>
@@ -60,7 +88,7 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-success/10"><Target className="h-5 w-5 text-success" /></div>
             <div>
@@ -73,7 +101,7 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-destructive/10"><AlertTriangle className="h-5 w-5 text-destructive" /></div>
             <div>
@@ -82,7 +110,7 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-secondary/10"><Flame className="h-5 w-5 text-secondary" /></div>
             <div>
@@ -94,17 +122,17 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Quick actions */}
-      <Card>
+      <Card className="card-hover">
         <CardHeader><CardTitle className="text-lg">🎯 এখনই শুরু করো</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
-          <Link to="/mcq"><Button>MCQ অনুশীলন</Button></Link>
-          <Link to="/explain"><Button variant="outline">বুঝিয়ে দাও</Button></Link>
-          <Link to="/srijonshil"><Button variant="outline">সৃজনশীল Builder</Button></Link>
+          <Link to="/mcq"><Button className="btn-ripple">MCQ অনুশীলন</Button></Link>
+          <Link to="/explain"><Button variant="outline" className="btn-ripple">বুঝিয়ে দাও</Button></Link>
+          <Link to="/srijonshil"><Button variant="outline" className="btn-ripple">সৃজনশীল Builder</Button></Link>
         </CardContent>
       </Card>
 
       {/* Weekly chart */}
-      <Card>
+      <Card className="card-hover">
         <CardHeader><CardTitle className="text-lg">📊 সাপ্তাহিক অগ্রগতি</CardTitle></CardHeader>
         <CardContent>
           <div className="h-48">
@@ -123,7 +151,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Recent activity */}
       {recentSessions.length > 0 && (
-        <Card>
+        <Card className="card-hover">
           <CardHeader><CardTitle className="text-lg">সাম্প্রতিক কার্যকলাপ</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -148,7 +176,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Weak topics */}
       {weakTopics.length > 0 && (
-        <Card>
+        <Card className="card-hover">
           <CardHeader><CardTitle className="text-lg text-destructive">⚠️ দুর্বল বিষয়</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {weakTopics.map((w) => (
@@ -158,7 +186,7 @@ const DashboardPage: React.FC = () => {
                   <p className="text-xs text-muted-foreground">ভুল: {w.wrong_count} বার</p>
                 </div>
                 <Link to="/mcq">
-                  <Button size="sm" variant="outline">অনুশীলন করো</Button>
+                  <Button size="sm" variant="outline" className="btn-ripple">অনুশীলন করো</Button>
                 </Link>
               </div>
             ))}
