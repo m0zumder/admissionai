@@ -16,6 +16,7 @@ import MockExam from "./pages/MockExam";
 import Progress from "./pages/Progress";
 import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
+import Notebook from "./pages/Notebook";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
