@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import logo from '@/assets/logo.png';
 
 const LoginPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -116,9 +117,11 @@ const LoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center text-2xl">
-            📚 Admission AI
-          </CardTitle>
+          <div className="flex flex-col items-center gap-2">
+            <img src={logo} alt="Admission AI" className="h-14 w-14 rounded-full" />
+            <CardTitle className="text-center text-2xl">Admission AI</CardTitle>
+            <p className="text-xs font-medium tracking-widest uppercase text-primary/70">Smart Learning, Simplified Prep</p>
+          </div>
           <p className="text-center text-muted-foreground text-sm">
             {isSignUp ? 'নতুন অ্যাকাউন্ট তৈরি করো' : 'তোমার অ্যাকাউন্টে লগ ইন করো'}
           </p>
