@@ -90,6 +90,34 @@ const SettingsPage: React.FC = () => {
       </Card>
 
       <Card>
+        <CardHeader><CardTitle>ডিসপ্লে</CardTitle></CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {document.documentElement.classList.contains('dark') ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              <div>
+                <p className="font-medium text-sm">ডার্ক মোড</p>
+                <p className="text-xs text-muted-foreground">রাতে পড়ার জন্য চোখের আরাম</p>
+              </div>
+            </div>
+            <Switch
+              checked={document.documentElement.classList.contains('dark')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  document.documentElement.classList.add('dark');
+                  localStorage.setItem('theme', 'dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  localStorage.setItem('theme', 'light');
+                }
+                // Force re-render
+                setName((n) => n);
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
         <CardHeader><CardTitle>অ্যাকাউন্ট</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <Button variant="outline" className="w-full" onClick={signOut}>
