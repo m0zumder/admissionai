@@ -10,8 +10,8 @@ serve(async (req) => {
 
   try {
     const { subject, topic, classLevel, count } = await req.json();
-    const GEMINI_API_KEY = Deno.env.get("VITE_GEMINI_API_KEY");
-    if (!GEMINI_API_KEY) throw new Error("VITE_GEMINI_API_KEY not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = `তুমি বাংলাদেশের NCTB পাঠ্যক্রম অনুযায়ী ${classLevel} পরীক্ষার MCQ তৈরি করো।
 প্রতিটি MCQ তে:
@@ -23,20 +23,61 @@ serve(async (req) => {
 
     const userMessage = `Subject: ${subject}, Topic: ${topic || 'General'}, Class: ${classLevel}. Generate ${count} MCQ questions. Return as JSON array with format: {"questions": [{"question": "...", "options": [{"text": "...", "isCorrect": true/false}], "explanation": "..."}]}. Return ONLY valid JSON, no markdown.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [{ role: "user", parts: [{ text: userMessage }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "generate_mcq",
+              description: "Generate MCQ questions in structured format",
+              parameters: {
+                type: "object",
+                properties: {
+                  questions: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        question: { type: "string" },
+                        options: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              text: { type: "string" },
+                              isCorrect: { type: "boolean" },
+                            },
+                            required: ["text", "isCorrect"],
+                            additionalProperties: false,
+                          },
+                        },
+                        explanation: { type: "string" },
+                      },
+                      required: ["question", "options", "explanation"],
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                required: ["questions"],
+                additionalProperties: false,
+              },
+            },
           },
-        }),
-      }
-    );
+        ],
+        tool_choice: { type: "function", function: { name: "generate_mcq" } },
+      }),
+    });
 
     if (!response.ok) {
       const status = response.status;
@@ -45,16 +86,21 @@ serve(async (req) => {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      if (status === 402) {
+        return new Response(JSON.stringify({ error: "Payment required. Please add funds." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const errText = await response.text();
-      console.error("Gemini API error:", status, errText);
-      throw new Error(`Gemini API error: ${status}`);
+      console.error("AI gateway error:", status, errText);
+      throw new Error(`AI gateway error: ${status}`);
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error("No response from Gemini");
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall) throw new Error("No tool call response");
 
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(toolCall.function.arguments);
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
