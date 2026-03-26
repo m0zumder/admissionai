@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Lightbulb, PenTool, BarChart3, Star, Users, CheckCircle } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const features = [
   { icon: '🧠', title: 'MCQ Practice', desc: 'Board pattern অনুযায়ী হাজারো MCQ' },
@@ -30,7 +31,8 @@ const LandingPage: React.FC = () => {
       <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-bold text-primary flex items-center gap-2">
-            📚 Admission AI
+            <img src={logo} alt="Admission AI" className="h-9 w-9 rounded-full" />
+            Admission AI
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">ফিচারস</a>
@@ -160,9 +162,10 @@ const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer className="bg-primary text-primary-foreground py-12">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-xl font-bold mb-2">📚 Admission AI</p>
+          <img src={logo} alt="Admission AI" className="h-12 w-12 rounded-full mx-auto mb-3" />
+          <p className="text-xl font-bold mb-2">Admission AI</p>
           <p className="text-sm opacity-70 mb-4">বাংলাদেশের শিক্ষার্থীদের জন্য AI-powered শিক্ষা প্ল্যাটফর্ম</p>
-          <p className="text-xs opacity-50">© 2025 Admission AI. All rights reserved.</p>
+          <p className="text-xs opacity-50">© 2026 Admission AI. All rights reserved Mozlish Studio.</p>
         </div>
       </footer>
     </div>
