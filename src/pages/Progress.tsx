@@ -13,6 +13,7 @@ const ProgressPage: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [subjectData, setSubjectData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
+  const [scoreTrend, setScoreTrend] = useState<any[]>([]);
 
   useEffect(() => {
     if (!profile) return;
