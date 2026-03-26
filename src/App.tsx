@@ -47,6 +47,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-fail" element={<PaymentFail />} />
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<DashboardRoute><Dashboard /></DashboardRoute>} />
