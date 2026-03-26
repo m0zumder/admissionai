@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import logo from '@/assets/logo.png';
 
 const navItems = [
   { title: 'ড্যাশবোর্ড', url: '/dashboard', icon: LayoutDashboard },
@@ -41,9 +42,7 @@ function AppSidebarContent() {
         {!collapsed && (
           <div className="p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center text-lg font-bold">
-                {profile?.name?.[0] || '📚'}
-              </div>
+              <img src={logo} alt="Admission AI" className="w-10 h-10 rounded-full" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{profile?.name || 'শিক্ষার্থী'}</p>
                 <p className="text-xs opacity-70">{profile?.class_level || 'ক্লাস নির্বাচন করুন'}</p>
@@ -102,7 +101,10 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             <SidebarTrigger>
               <Menu className="h-5 w-5" />
             </SidebarTrigger>
-            <h1 className="text-lg font-bold text-primary">📚 Admission AI</h1>
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="Admission AI" className="h-8 w-8 rounded-full" />
+              <h1 className="text-lg font-bold text-primary">Admission AI</h1>
+            </div>
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-auto">
             {children}
