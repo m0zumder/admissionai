@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.100.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,24 +9,28 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Create bucket if it doesn't exist
-    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-    const exists = buckets?.some((b: any) => b.id === "notebooks");
-    
-    if (!exists) {
-      const { error } = await supabaseAdmin.storage.createBucket("notebooks", {
+    // Use the Storage API directly with service role
+    const createResp = await fetch(`${SUPABASE_URL}/storage/v1/bucket`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+        apikey: SERVICE_ROLE_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: "notebooks",
+        name: "notebooks",
         public: false,
-        fileSizeLimit: 20971520, // 20MB
-      });
-      if (error) throw error;
-    }
+        file_size_limit: 20971520,
+      }),
+    });
 
-    return new Response(JSON.stringify({ success: true }), {
+    const result = await createResp.json();
+    
+    return new Response(JSON.stringify({ success: true, result }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
