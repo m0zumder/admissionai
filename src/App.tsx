@@ -29,7 +29,7 @@ const DashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   </ProtectedRoute>
 );
 
-// Initialize theme from localStorage
+// Initialize theme from localStorage - v2
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
   document.documentElement.classList.add('dark');
