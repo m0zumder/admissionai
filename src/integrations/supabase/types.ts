@@ -14,7 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      creative_answers: {
+        Row: {
+          created_at: string
+          generated_answer: string
+          id: string
+          subject: string
+          uddipok: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generated_answer: string
+          id?: string
+          subject: string
+          uddipok: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generated_answer?: string
+          id?: string
+          subject?: string
+          uddipok?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mcq_sessions: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          id: string
+          questions_attempted: number
+          score_percentage: number
+          subject_id: string | null
+          topic_id: string | null
+          user_id: string
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          questions_attempted?: number
+          score_percentage?: number
+          subject_id?: string | null
+          topic_id?: string | null
+          user_id: string
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          questions_attempted?: number
+          score_percentage?: number
+          subject_id?: string | null
+          topic_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcq_sessions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mcq_sessions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          class_level: string | null
+          created_at: string
+          daily_explain_count: number
+          daily_mcq_count: number
+          daily_srijonshil_count: number
+          id: string
+          last_reset_date: string
+          name: string | null
+          subscription_plan: string
+          target_exam: string | null
+        }
+        Insert: {
+          class_level?: string | null
+          created_at?: string
+          daily_explain_count?: number
+          daily_mcq_count?: number
+          daily_srijonshil_count?: number
+          id: string
+          last_reset_date?: string
+          name?: string | null
+          subscription_plan?: string
+          target_exam?: string | null
+        }
+        Update: {
+          class_level?: string | null
+          created_at?: string
+          daily_explain_count?: number
+          daily_mcq_count?: number
+          daily_srijonshil_count?: number
+          id?: string
+          last_reset_date?: string
+          name?: string | null
+          subscription_plan?: string
+          target_exam?: string | null
+        }
+        Relationships: []
+      }
+      subjects: {
+        Row: {
+          class_level: string
+          icon: string
+          id: string
+          name_bn: string
+          name_en: string
+        }
+        Insert: {
+          class_level: string
+          icon?: string
+          id?: string
+          name_bn: string
+          name_en: string
+        }
+        Update: {
+          class_level?: string
+          icon?: string
+          id?: string
+          name_bn?: string
+          name_en?: string
+        }
+        Relationships: []
+      }
+      topics: {
+        Row: {
+          chapter_number: number
+          id: string
+          name_bn: string
+          name_en: string
+          subject_id: string
+        }
+        Insert: {
+          chapter_number?: number
+          id?: string
+          name_bn: string
+          name_en: string
+          subject_id: string
+        }
+        Update: {
+          chapter_number?: number
+          id?: string
+          name_bn?: string
+          name_en?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weak_topics: {
+        Row: {
+          id: string
+          last_attempted: string
+          topic_id: string
+          user_id: string
+          wrong_count: number
+        }
+        Insert: {
+          id?: string
+          last_attempted?: string
+          topic_id: string
+          user_id: string
+          wrong_count?: number
+        }
+        Update: {
+          id?: string
+          last_attempted?: string
+          topic_id?: string
+          user_id?: string
+          wrong_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weak_topics_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
