@@ -8,7 +8,7 @@ import {
 import { NavLink } from '@/components/NavLink';
 import {
   LayoutDashboard, BookOpen, Lightbulb, PenTool, FileText,
-  BarChart3, CreditCard, Settings, LogOut, Menu, ClipboardList,
+  BarChart3, CreditCard, Settings, LogOut, Menu, ClipboardList, Trophy,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ const navItems = [
   { title: 'নোটবুক', url: '/notebook', icon: FileText },
   { title: 'মক পরীক্ষা', url: '/mock-exam', icon: ClipboardList },
   { title: 'প্রগ্রেস', url: '/progress', icon: BarChart3 },
+  { title: 'লিডারবোর্ড', url: '/leaderboard', icon: Trophy },
   { title: 'প্রাইসিং', url: '/pricing', icon: CreditCard },
   { title: 'সেটিংস', url: '/settings', icon: Settings },
 ];

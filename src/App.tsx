@@ -17,6 +17,7 @@ import Progress from "./pages/Progress";
 import Pricing from "./pages/Pricing";
 import Settings from "./pages/Settings";
 import Notebook from "./pages/Notebook";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -27,6 +28,14 @@ const DashboardRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     <DashboardLayout>{children}</DashboardLayout>
   </ProtectedRoute>
 );
+
+// Initialize theme from localStorage
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  document.documentElement.classList.add('dark');
+} else if (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -47,6 +56,7 @@ const App = () => (
             <Route path="/pricing" element={<DashboardRoute><Pricing /></DashboardRoute>} />
             <Route path="/settings" element={<DashboardRoute><Settings /></DashboardRoute>} />
             <Route path="/notebook" element={<DashboardRoute><Notebook /></DashboardRoute>} />
+            <Route path="/leaderboard" element={<DashboardRoute><Leaderboard /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />

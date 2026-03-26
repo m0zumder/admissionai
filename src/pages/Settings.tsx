@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Moon, Sun } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
   const { profile, refreshProfile, signOut } = useAuth();
@@ -83,6 +85,35 @@ const SettingsPage: React.FC = () => {
               <Badge className="mt-1">{profile?.subscription_plan || 'Free'}</Badge>
             </div>
             <a href="/pricing"><Button variant="outline" size="sm">Upgrade</Button></a>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>ডিসপ্লে</CardTitle></CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {document.documentElement.classList.contains('dark') ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              <div>
+                <p className="font-medium text-sm">ডার্ক মোড</p>
+                <p className="text-xs text-muted-foreground">রাতে পড়ার জন্য চোখের আরাম</p>
+              </div>
+            </div>
+            <Switch
+              checked={document.documentElement.classList.contains('dark')}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  document.documentElement.classList.add('dark');
+                  localStorage.setItem('theme', 'dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  localStorage.setItem('theme', 'light');
+                }
+                // Force re-render
+                setName((n) => n);
+              }}
+            />
           </div>
         </CardContent>
       </Card>
