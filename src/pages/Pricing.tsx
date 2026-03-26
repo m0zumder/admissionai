@@ -1,53 +1,53 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check, X } from 'lucide-react';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 
 const plans = [
   {
-    name: 'FREE',
-    price: '৳০',
-    period: '/মাস',
+    name: "FREE",
+    price: "৳০",
+    period: "/মাস",
     features: [
-      { text: 'দিনে ১০টি MCQ', included: true },
-      { text: 'দিনে ৩টি topic explanation', included: true },
-      { text: 'দিনে ২টি সৃজনশীল', included: true },
-      { text: 'Mock Exam', included: false },
-      { text: 'Progress Analytics', included: false },
-      { text: 'Photo Scan', included: false },
+      { text: "দিনে ১০টি MCQ", included: true },
+      { text: "দিনে ৩টি topic explanation", included: true },
+      { text: "দিনে ২টি সৃজনশীল", included: true },
+      { text: "Mock Exam", included: false },
+      { text: "Progress Analytics", included: false },
+      { text: "Photo Scan", included: false },
     ],
-    cta: 'এখনই শুরু করো',
+    cta: "এখনই শুরু করো",
     popular: false,
   },
   {
-    name: 'STUDENT',
-    price: '৳১১৯৯',
-    period: '/মাস',
+    name: "STUDENT",
+    price: "৳১৯৯",
+    period: "/মাস",
     features: [
-      { text: 'সীমাহীন MCQ', included: true },
-      { text: 'সীমাহীন explanations', included: true },
-      { text: 'সীমাহীন সৃজনশীল', included: true },
-      { text: 'Full Mock Exams', included: true },
-      { text: 'Progress Analytics', included: true },
-      { text: 'Photo Scan', included: false },
+      { text: "সীমাহীন MCQ", included: true },
+      { text: "সীমাহীন explanations", included: true },
+      { text: "সীমাহীন সৃজনশীল", included: true },
+      { text: "Full Mock Exams", included: true },
+      { text: "Progress Analytics", included: true },
+      { text: "Photo Scan", included: false },
     ],
-    cta: 'এখনই নিন',
+    cta: "এখনই নিন",
     popular: true,
   },
   {
-    name: 'PREMIUM',
-    price: '৳৪৯৯',
-    period: '/মাস',
+    name: "PREMIUM",
+    price: "৳৩৯৯",
+    period: "/মাস",
     features: [
-      { text: 'সব কিছু Student plan এ', included: true },
-      { text: 'Photo/Image scan', included: true },
-      { text: 'Priority AI response', included: true },
-      { text: 'Personalized study plan', included: true },
-      { text: 'WhatsApp support', included: true },
-      { text: 'Notebook (আমার নোটবুক)', included: true },
+      { text: "সব কিছু Student plan এ", included: true },
+      { text: "Photo/Image scan", included: true },
+      { text: "Priority AI response", included: true },
+      { text: "Personalized study plan", included: true },
+      { text: "WhatsApp support", included: true },
+      { text: "Notebook (আমার নোটবুক)", included: true },
     ],
-    cta: 'Premium নিন',
+    cta: "Premium নিন",
     popular: false,
   },
 ];
@@ -64,7 +64,7 @@ const PricingPage: React.FC = () => {
         {plans.map((plan) => (
           <Card
             key={plan.name}
-            className={`relative ${plan.popular ? 'border-2 border-secondary shadow-xl scale-105' : 'border-border'}`}
+            className={`relative ${plan.popular ? "border-2 border-secondary shadow-xl scale-105" : "border-border"}`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full">
@@ -87,14 +87,11 @@ const PricingPage: React.FC = () => {
                     ) : (
                       <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     )}
-                    <span className={f.included ? '' : 'text-muted-foreground'}>{f.text}</span>
+                    <span className={f.included ? "" : "text-muted-foreground"}>{f.text}</span>
                   </li>
                 ))}
               </ul>
-              <Button
-                className="w-full"
-                variant={plan.popular ? 'default' : 'outline'}
-              >
+              <Button className="w-full" variant={plan.popular ? "default" : "outline"}>
                 {plan.cta}
               </Button>
             </CardContent>
@@ -107,11 +104,7 @@ const PricingPage: React.FC = () => {
           <CardContent className="p-6">
             <p className="font-semibold mb-2">💳 পেমেন্ট পদ্ধতি</p>
             <p className="text-sm text-muted-foreground mb-4">bKash / Nagad / Card দিয়ে পেমেন্ট করুন</p>
-            <a
-              href="https://wa.me/8801609059992"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://wa.me/8801609059992" target="_blank" rel="noopener noreferrer">
               <Button variant="outline">WhatsApp এ যোগাযোগ করুন</Button>
             </a>
           </CardContent>
