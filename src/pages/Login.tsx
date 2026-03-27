@@ -36,6 +36,8 @@ const HSC_STREAMS = [
 
 const LoginPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isParent, setIsParent] = useState(false);
+  const [parentLinkingCode, setParentLinkingCode] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -82,10 +84,37 @@ const LoginPage: React.FC = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
-        setOnboardingStep(1);
+        if (isParent) {
+          // Mark as parent and link child
+          const { data: { user: newUser } } = await supabase.auth.getUser();
+          if (newUser) {
+            await supabase.from('profiles').update({ is_parent: true, name }).eq('id', newUser.id);
+            if (parentLinkingCode) {
+              const { data: link } = await supabase.from('parent_links').select('*').eq('linking_code', parentLinkingCode).eq('status', 'pending').single();
+              if (link) {
+                await supabase.from('parent_links').update({ parent_id: newUser.id, status: 'linked' }).eq('id', link.id);
+                toast({ title: 'সন্তানের সাথে যুক্ত হয়েছে ✓' });
+              } else {
+                toast({ title: 'ভুল কোড বা মেয়াদ উত্তীর্ণ', variant: 'destructive' });
+              }
+            }
+            navigate('/parent-dashboard');
+          }
+        } else {
+          setOnboardingStep(1);
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        // Check if parent
+        const { data: { user: loggedUser } } = await supabase.auth.getUser();
+        if (loggedUser) {
+          const { data: prof } = await supabase.from('profiles').select('is_parent').eq('id', loggedUser.id).single();
+          if (prof && (prof as any).is_parent) {
+            navigate('/parent-dashboard');
+            return;
+          }
+        }
         navigate('/dashboard');
       }
     } catch (err: any) {
@@ -322,7 +351,19 @@ const LoginPage: React.FC = () => {
             <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">অথবা ইমেইল দিয়ে</span></div>
           </div>
 
+          {/* Parent toggle */}
+          <div className="flex items-center justify-between p-3 bg-muted rounded-lg mb-4">
+            <Label className="text-sm cursor-pointer">আমি অভিভাবক লগইন করছি</Label>
+            <input type="checkbox" checked={isParent} onChange={e => setIsParent(e.target.checked)} className="h-4 w-4 accent-primary" />
+          </div>
+
           <form onSubmit={handleAuth} className="space-y-4">
+            {isParent && isSignUp && (
+              <div>
+                <Label>তোমার নাম</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="অভিভাবকের নাম" />
+              </div>
+            )}
             <div>
               <Label>ইমেইল</Label>
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" required />
@@ -331,6 +372,13 @@ const LoginPage: React.FC = () => {
               <Label>পাসওয়ার্ড</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
             </div>
+            {isParent && isSignUp && (
+              <div>
+                <Label>সন্তানের Linking Code</Label>
+                <Input value={parentLinkingCode} onChange={(e) => setParentLinkingCode(e.target.value)} placeholder="6-digit code" maxLength={6} />
+                <p className="text-xs text-muted-foreground mt-1">সন্তানের Settings থেকে কোড নিন</p>
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'অপেক্ষা করুন...' : isSignUp ? 'সাইন আপ করো' : 'লগ ইন করো'}
             </Button>
