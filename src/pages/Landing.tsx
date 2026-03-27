@@ -30,7 +30,7 @@ const competitorComparisons = [
   { icon: '🌐', title: 'Web-based — কোনো App লাগবে না', desc: 'Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল — সব সাপোর্ট। App crash এর চিন্তা নেই।' },
   { icon: '🆓', title: 'Free তেই AI ফিচার', desc: 'MCQ, Topic Explain, সৃজনশীল, ছবি থেকে সমাধান — সব AI ফিচার Free plan এ পাওয়া যায়। কোনো Sales Call আসবে না।' },
   { icon: '🌙', title: 'Anytime, Anywhere — AI সবসময় Available', desc: 'রাত ৩টায়ও প্রশ্ন করো, সাথে সাথে উত্তর পাবে। কোনো ক্লাস cancel হবে না। 24/7/365 AI শিক্ষক তোমার পাশে।' },
-  { icon: '🔒', title: 'Google Login — ঝামেলা নেই', desc: 'শুধু Google দিয়ে লগ ইন করো। কোনো ফোন নম্বর দেওয়া লাগবে না, কোনো OTP ঝামেলা নেই।' },
+  { icon: '🔒', title: 'Google Login — ঝামেলা নেই', desc: 'শুধু Google দিয়ে লগ ইন করো। কোনো OTP ঝামেলা নেই।' },
   { icon: '📸', title: 'ছবি তুলে সমাধান পাও', desc: 'প্রশ্নের ছবি তোলো — AI ধাপে ধাপে বাংলায় সমাধান দেবে। গণিত, পদার্থবিজ্ঞান, রসায়ন সব কাজ করে।' },
   { icon: '💸', title: 'মাত্র ৳199/মাস', desc: 'Shikho ৳800-2000, 10MS ৳500+। আমাদের Student Plan মাত্র ৳199/মাস। সেরা ফিচার, সেরা দাম।' },
 ];
@@ -40,7 +40,7 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Slim yellow web-first banner */}
       <div className="bg-amber-400 text-amber-950 text-center py-2 px-4 text-sm font-medium">
-        ✅ কোনো App ইনস্টল লাগবে না — Browser এই চলে | 🌙 AI সবসময় Available 24/7 | 💸 মাত্র ৳199/মাস
+        ✅ কোনো App ইনস্টল লাগবে না — Browser এই চলে | 🌙 24/7 Available AI Tutor - মাত্র ৳199/মাস
       </div>
 
       {/* Navbar */}
