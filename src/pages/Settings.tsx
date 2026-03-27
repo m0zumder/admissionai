@@ -117,7 +117,7 @@ const SettingsPage: React.FC = () => {
 
       <Card>
         <CardHeader><CardTitle>ডিসপ্লে</CardTitle></CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {document.documentElement.classList.contains('dark') ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
@@ -134,6 +134,27 @@ const SettingsPage: React.FC = () => {
                 setName((n) => n);
               }}
             />
+          </div>
+          <div>
+            <p className="font-medium text-sm mb-2">ফন্ট সাইজ</p>
+            <div className="flex gap-2">
+              {[
+                { key: 'small', label: 'ক', size: 'text-sm' },
+                { key: 'medium', label: 'ক', size: 'text-base' },
+                { key: 'large', label: 'ক', size: 'text-xl' },
+              ].map((f) => (
+                <Button key={f.key}
+                  variant={(localStorage.getItem('fontSize') || 'medium') === f.key ? 'default' : 'outline'}
+                  className={f.size}
+                  onClick={() => {
+                    localStorage.setItem('fontSize', f.key);
+                    document.documentElement.setAttribute('data-font-size', f.key);
+                    setName(n => n);
+                  }}>
+                  {f.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
