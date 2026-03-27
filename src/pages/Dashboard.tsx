@@ -30,6 +30,7 @@ const DashboardPage: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<{ title: string; path: string }[]>([]);
+  const [parentMessage, setParentMessage] = useState<any>(null);
 
   const todayTip = useMemo(() => {
     const dayIndex = Math.floor(Date.now() / 86400000) % STUDY_TIPS.length;
@@ -47,6 +48,7 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     if (!profile) return;
     loadData();
+    loadParentMessage();
     // Daily login XP
     if (!hasStudiedToday) {
       addXP(5);
@@ -57,6 +59,18 @@ const DashboardPage: React.FC = () => {
     const rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
     setRecentlyViewed(rv.slice(0, 5));
   }, [profile]);
+
+  const loadParentMessage = async () => {
+    const { data } = await supabase.from('parent_messages').select('*').eq('child_id', profile!.id).eq('read', false).order('created_at', { ascending: false }).limit(1);
+    if (data && data.length > 0) setParentMessage(data[0]);
+  };
+
+  const dismissParentMessage = async () => {
+    if (parentMessage) {
+      await supabase.from('parent_messages').update({ read: true }).eq('id', parentMessage.id);
+      setParentMessage(null);
+    }
+  };
 
   // Track page visit
   useEffect(() => {
@@ -93,6 +107,19 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
       <h2 className="text-2xl font-bold">স্বাগতম, {profile?.name || 'শিক্ষার্থী'} 👋</h2>
+
+      {/* Parent message notification */}
+      {parentMessage && (
+        <Card className="border-blue-400/50 bg-blue-50 dark:bg-blue-950/30">
+          <CardContent className="p-4 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">💙 বাবা/মা বলেছেন:</p>
+              <p className="text-sm">{parentMessage.message}</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={dismissParentMessage} className="shrink-0 text-xs">পড়েছি ✓</Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* XP + Level + Streak bar */}
       <Card className="card-hover overflow-hidden">

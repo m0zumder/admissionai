@@ -21,6 +21,7 @@ type Profile = {
   last_activity_date?: string;
   weekly_xp?: number;
   font_size?: string;
+  is_parent?: boolean;
 };
 
 type AuthContextType = {

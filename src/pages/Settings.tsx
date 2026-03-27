@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Link2, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
@@ -23,7 +23,7 @@ const EXAM_OPTIONS = [
 ];
 
 const SettingsPage: React.FC = () => {
-  const { profile, refreshProfile, signOut } = useAuth();
+  const { profile, refreshProfile, signOut, user } = useAuth();
   const { toast } = useToast();
   const [name, setName] = useState(profile?.name || '');
   const [classLevel, setClassLevel] = useState(profile?.class_level || '');
@@ -31,6 +31,30 @@ const SettingsPage: React.FC = () => {
   const [avatarEmoji, setAvatarEmoji] = useState(profile?.avatar_emoji || '📚');
   const [examDate, setExamDate] = useState<Date | undefined>(profile?.exam_date ? new Date(profile.exam_date) : undefined);
   const [saving, setSaving] = useState(false);
+  const [linkingCode, setLinkingCode] = useState('');
+  const [parentLinked, setParentLinked] = useState(false);
+  const [generatingCode, setGeneratingCode] = useState(false);
+
+  useEffect(() => {
+    if (user) checkParentLink();
+  }, [user]);
+
+  const checkParentLink = async () => {
+    const { data } = await supabase.from('parent_links').select('*').eq('child_id', user!.id).eq('status', 'linked');
+    if (data && data.length > 0) setParentLinked(true);
+    // Check for existing pending code
+    const { data: pending } = await supabase.from('parent_links').select('*').eq('child_id', user!.id).eq('status', 'pending');
+    if (pending && pending.length > 0) setLinkingCode(pending[0].linking_code);
+  };
+
+  const generateLinkingCode = async () => {
+    setGeneratingCode(true);
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    await supabase.from('parent_links').insert({ child_id: user!.id, linking_code: code, status: 'pending' });
+    setLinkingCode(code);
+    setGeneratingCode(false);
+    toast({ title: `Linking Code: ${code}`, description: '২৪ ঘণ্টার মধ্যে অভিভাবককে দিন' });
+  };
 
   const handleSave = async () => {
     if (!profile) return;
@@ -156,6 +180,31 @@ const SettingsPage: React.FC = () => {
               ))}
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Parent linking */}
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><Link2 className="h-5 w-5" /> অভিভাবক সংযোগ</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          {parentLinked ? (
+            <div className="flex items-center gap-2 text-sm text-green-600">
+              <Check className="h-4 w-4" /> আপনার অভিভাবক যুক্ত আছেন ✓
+            </div>
+          ) : (
+            <>
+              {linkingCode ? (
+                <div className="text-center p-4 bg-primary/10 rounded-xl">
+                  <p className="text-xs text-muted-foreground mb-2">এই কোড অভিভাবককে দিন (২৪ ঘণ্টা বৈধ)</p>
+                  <p className="text-3xl font-mono font-bold tracking-widest text-primary">{linkingCode}</p>
+                </div>
+              ) : (
+                <Button className="w-full" onClick={generateLinkingCode} disabled={generatingCode}>
+                  {generatingCode ? 'তৈরি হচ্ছে...' : 'Linking Code তৈরি করো'}
+                </Button>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 
