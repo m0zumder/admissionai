@@ -200,9 +200,7 @@ const LandingPage: React.FC = () => {
       {/* Why Us - Competitor pain points */}
       <section id="why-us" className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-4">কেন Admission AI সেরা?</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
-          Shikho, 10 Minute School, HulkenStein — সবার সীমাবদ্ধতা আমরা সমাধান করেছি
-        </p>
+        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto"></p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {competitorComparisons.map((item, index) => (
             <Card
