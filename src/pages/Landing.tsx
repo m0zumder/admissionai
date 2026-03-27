@@ -156,11 +156,11 @@ const LandingPage: React.FC = () => {
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">শিক্ষার্থীদের মতামত</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t) => (
-            <Card key={t.name} className="border-border/50">
+          {testimonials.map((t, index) => (
+            <Card key={t.name} className="border-border/50 card-hover animate-feature-pop" style={{ animationDelay: `${index * 0.15}s` }}>
               <CardContent className="p-6">
                 <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-secondary text-secondary" />)}
+                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-secondary text-secondary animate-bounce-in" style={{ animationDelay: `${index * 0.15 + i * 0.05 + 0.3}s` }} />)}
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">"{t.text}"</p>
                 <div>
