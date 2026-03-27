@@ -21,7 +21,7 @@ type MCQQuestion = {
   explanation: string;
 };
 
-const IMPORTANCE_CONFIG: Record<string, { color: string; dot: string; label: string; desc: string }> = {
+const IMPORTANCE_CONFIG: Record<string, { color: string; dot: string; dotColor: string; label: string; desc: string }> = {
   critical: { color: 'bg-destructive text-destructive-foreground', dot: 'circle', dotColor: 'text-destructive', label: 'অতি গুরুত্বপূর্ণ', desc: 'বোর্ডে ৫+ বার এসেছে' },
   high: { color: 'bg-secondary text-secondary-foreground', dot: 'circle', dotColor: 'text-yellow-500', label: 'গুরুত্বপূর্ণ', desc: 'বোর্ডে ৩-৪ বার এসেছে' },
   medium: { color: 'bg-primary/20 text-primary', dot: 'circle', dotColor: 'text-green-500', label: 'মাঝারি', desc: 'বোর্ডে ১-২ বার এসেছে' },

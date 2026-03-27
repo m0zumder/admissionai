@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
 import { Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type MCQQuestion = {
   question: string;
@@ -30,7 +31,7 @@ type ExamPreset = {
 
 const EXAM_PRESETS: Record<string, ExamPreset> = {
   medical: {
-    label: '🏥 Medical ভর্তি',
+    label: 'Medical ভর্তি', icon: 'hospital' as const,
     duration: 60 * 60,
     questionCount: 100,
     classLevel: 'Admission',
@@ -247,7 +248,7 @@ const MockExamPage: React.FC = () => {
   if (!isPremium) {
     return (
       <div className="max-w-md mx-auto text-center space-y-6 pb-20 md:pb-0 pt-12 animate-fade-in">
-        <div className="text-6xl">🔒</div>
+        <div className="text-6xl text-primary"><FontAwesomeIcon icon="lock" /></div>
         <h2 className="text-2xl font-bold">মক পরীক্ষা</h2>
         <p className="text-muted-foreground">মক পরীক্ষা ফিচারটি Student এবং Premium প্ল্যানে পাওয়া যায়।</p>
         <Button onClick={() => setShowUpgrade(true)}>Upgrade করুন</Button>
@@ -346,7 +347,7 @@ const MockExamPage: React.FC = () => {
       <div className="max-w-3xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
         <Card className="card-hover">
           <CardContent className="p-8 text-center">
-            <div className="text-6xl mb-4">{pct >= 70 ? '🎉' : pct >= 40 ? '👍' : '💪'}</div>
+            <div className="text-6xl mb-4 text-primary">{pct >= 70 ? <FontAwesomeIcon icon="champagne-glasses" /> : pct >= 40 ? <FontAwesomeIcon icon="thumbs-up" /> : <FontAwesomeIcon icon="dumbbell" />}</div>
             <h2 className="text-2xl font-bold mb-4">পরীক্ষার ফলাফল</h2>
             <p className="text-5xl font-bold text-primary mb-2">{finalScore.toFixed(2)}/{questions.length}</p>
             <div className="flex justify-center gap-6 mt-4 text-sm">
@@ -448,7 +449,7 @@ const MockExamPage: React.FC = () => {
   // SETUP
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📄 মক পরীক্ষা</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="file-lines" className="mr-2 text-primary" />মক পরীক্ষা</h2>
       <p className="text-muted-foreground">সম্পূর্ণ পরীক্ষার পরিবেশে টাইমড MCQ অনুশীলন করো</p>
 
       <div>
@@ -530,7 +531,7 @@ const MockExamPage: React.FC = () => {
               {!hasDistribution && <span>📚 {selectedSubjects.length} বিষয়</span>}
             </div>
             <Button className="w-full btn-ripple" size="lg" onClick={startExam} disabled={loading}>
-              {loading ? <ThinkingDots /> : 'পরীক্ষা শুরু করো 🚀'}
+              {loading ? <ThinkingDots /> : <><FontAwesomeIcon icon="rocket" className="mr-2" />পরীক্ষা শুরু করো</>}
             </Button>
           </CardContent>
         </Card>
