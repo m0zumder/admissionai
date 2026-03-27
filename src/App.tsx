@@ -28,6 +28,7 @@ import Badges from "./pages/Badges";
 import Bookmarks from "./pages/Bookmarks";
 import Planner from "./pages/Planner";
 import Challenge from "./pages/Challenge";
+import ParentDashboard from "./pages/ParentDashboard";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
