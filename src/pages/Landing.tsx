@@ -2,14 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Lightbulb, PenTool, BarChart3, Star, Users, CheckCircle } from 'lucide-react';
+import { Star } from 'lucide-react';
 import logo from '@/assets/logo.png';
 
 const features = [
   { icon: '🧠', title: 'MCQ Practice', desc: 'Board pattern অনুযায়ী হাজারো MCQ' },
   { icon: '💡', title: 'বুঝিয়ে দাও', desc: 'যেকোনো topic সহজ বাংলায়' },
   { icon: '✍️', title: 'সৃজনশীল Builder', desc: 'উদ্দীপক দাও, উত্তর পাও' },
+  { icon: '📸', title: 'ছবি থেকে সমাধান', desc: 'ছবি তুলো, AI সমাধান দাও' },
   { icon: '📊', title: 'Progress Tracker', desc: 'কোথায় দুর্বল জানো' },
+  { icon: '📄', title: 'মক পরীক্ষা', desc: 'পরীক্ষার পরিবেশে অনুশীলন' },
 ];
 
 const stats = [
@@ -50,6 +52,11 @@ const LandingPage: React.FC = () => {
         </div>
       </nav>
 
+      {/* Web-first Banner */}
+      <div className="bg-primary text-primary-foreground text-center py-2.5 text-sm font-medium">
+        ✅ কোনো App ইনস্টল লাগবে না — Browser এই চলে ✓ | 🌙 সারারাত পড়তে পারো — AI সবসময় Available
+      </div>
+
       {/* Hero */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-4xl mx-auto text-center">
@@ -58,9 +65,15 @@ const LandingPage: React.FC = () => {
             <span className="text-primary">এখন সহজ</span>
           </h1>
           <p className="text-sm font-medium tracking-widest uppercase text-primary/70 mb-3">Smart Learning, Simplified Prep</p>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
           </p>
+          <div className="flex flex-wrap gap-3 justify-center text-sm text-muted-foreground mb-8">
+            <span className="bg-muted px-3 py-1 rounded-full">🌐 যেকোনো Device এ চলে</span>
+            <span className="bg-muted px-3 py-1 rounded-full">🆓 Free তে শুরু করো</span>
+            <span className="bg-muted px-3 py-1 rounded-full">🤖 AI 24/7 Available</span>
+            <span className="bg-muted px-3 py-1 rounded-full">📱 No App Install</span>
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/login">
               <Button size="lg" className="text-lg px-8 py-6 w-full sm:w-auto">
@@ -88,9 +101,9 @@ const LandingPage: React.FC = () => {
             </Card>
             <Card className="animate-float-delayed glass-card">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold mb-2">💡 AI Explanation</p>
+                <p className="text-sm font-semibold mb-2">📸 ছবি থেকে সমাধান</p>
                 <p className="text-sm text-muted-foreground">
-                  সালোকসংশ্লেষণ হলো সেই প্রক্রিয়া যেখানে উদ্ভিদ সূর্যের আলো ব্যবহার করে খাদ্য তৈরি করে...
+                  প্রশ্নের ছবি তোলো → AI ধাপে ধাপে সমাধান দেয় বাংলায়!
                 </p>
               </CardContent>
             </Card>
@@ -101,7 +114,7 @@ const LandingPage: React.FC = () => {
       {/* Features */}
       <section id="features" className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">আমাদের ফিচারস</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f) => (
             <Card key={f.title} className="text-center hover:shadow-xl transition-shadow border-border/50">
               <CardContent className="p-6">
@@ -125,6 +138,27 @@ const LandingPage: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Why Us - Competitor pain points */}
+      <section className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">কেন Admission AI?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          {[
+            { icon: '🌐', title: 'Web-based — কোনো App লাগবে না', desc: 'Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল সব সাপোর্ট করে।' },
+            { icon: '🆓', title: 'Free তেই AI ফিচার', desc: 'MCQ, Topic Explain, সৃজনশীল — সব AI ফিচার Free plan এ পাওয়া যায় (দৈনিক সীমিত)।' },
+            { icon: '🌙', title: 'সারারাত পড়তে পারো', desc: 'AI শিক্ষক 24/7 Available। রাত ৩টায়ও প্রশ্ন করো, সাথে সাথে উত্তর পাবে।' },
+            { icon: '🔒', title: 'Google Login — ঝামেলা নেই', desc: 'শুধু Google দিয়ে লগ ইন করো। কোনো ফোন নম্বর দেওয়া লাগবে না।' },
+          ].map((item) => (
+            <Card key={item.title} className="border-border/50">
+              <CardContent className="p-6">
+                <div className="text-3xl mb-3">{item.icon}</div>
+                <h3 className="font-bold mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </section>
 

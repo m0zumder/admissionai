@@ -8,24 +8,54 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
+import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
+
+const AVATARS = ['📚', '🎓', '👨‍🎓', '👩‍🎓', '🦁', '🐯', '⚡', '🔥', '🌟', '💪', '🏆', '🎯'];
+
+const EXAM_OPTIONS = [
+  { id: 'SSC 2025', icon: '📝', label: 'SSC 2025' },
+  { id: 'SSC 2026', icon: '📝', label: 'SSC 2026' },
+  { id: 'HSC 2025', icon: '📖', label: 'HSC 2025' },
+  { id: 'HSC 2026', icon: '📖', label: 'HSC 2026' },
+  { id: 'Medical ভর্তি', icon: '🏥', label: 'Medical ভর্তি' },
+  { id: 'BUET ভর্তি', icon: '⚙️', label: 'BUET ভর্তি' },
+  { id: 'GST', icon: '🏛️', label: 'GST (সরকারি বিশ্ববিদ্যালয়)' },
+  { id: 'ঢাকা বিশ্ববিদ্যালয়', icon: '🎓', label: 'ঢাকা বিশ্ববিদ্যালয়' },
+];
 
 const LoginPage: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0); // 0 = login, 1-4 = onboarding
   const [name, setName] = useState('');
-  const [classLevel, setClassLevel] = useState('');
+  const [avatarEmoji, setAvatarEmoji] = useState('📚');
   const [targetExam, setTargetExam] = useState('');
+  const [examDate, setExamDate] = useState<Date | undefined>();
+  const [weakSubjects, setWeakSubjects] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
 
   React.useEffect(() => {
-    if (user && !showOnboarding) navigate('/dashboard');
-  }, [user, showOnboarding]);
+    if (user && onboardingStep === 0) navigate('/dashboard');
+  }, [user, onboardingStep]);
+
+  // Load subjects when exam is selected
+  React.useEffect(() => {
+    if (targetExam) {
+      const classLevel = targetExam.includes('SSC') ? 'SSC' : targetExam.includes('HSC') ? 'HSC' : 'Admission';
+      supabase.from('subjects').select('*').eq('class_level', classLevel)
+        .then(({ data }) => setSubjects(data || []));
+    }
+  }, [targetExam]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +64,7 @@ const LoginPage: React.FC = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
-        setShowOnboarding(true);
+        setOnboardingStep(1);
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -46,67 +76,181 @@ const LoginPage: React.FC = () => {
     setLoading(false);
   };
 
-  const handleOnboarding = async () => {
-    if (!name || !classLevel || !targetExam) {
-      toast({ title: 'সব তথ্য দিন', variant: 'destructive' });
+  const handleOnboardingComplete = async () => {
+    if (!name || !targetExam) {
+      toast({ title: 'নাম ও পরীক্ষা নির্বাচন করো', variant: 'destructive' });
       return;
     }
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
+      const classLevel = targetExam.includes('SSC') ? 'SSC' : targetExam.includes('HSC') ? 'HSC' : 'Admission';
       await supabase.from('profiles').update({
-        name, class_level: classLevel, target_exam: targetExam,
+        name,
+        avatar_emoji: avatarEmoji,
+        class_level: classLevel,
+        target_exam: targetExam,
+        exam_date: examDate ? format(examDate, 'yyyy-MM-dd') : null,
       }).eq('id', user.id);
+
+      // Save weak subjects to weak_topics
+      if (weakSubjects.length > 0) {
+        const { data: topicsData } = await supabase.from('topics').select('id, subject_id')
+          .in('subject_id', weakSubjects);
+        if (topicsData && topicsData.length > 0) {
+          const weakEntries = topicsData.slice(0, 5).map(t => ({
+            user_id: user.id,
+            topic_id: t.id,
+            wrong_count: 1,
+          }));
+          await supabase.from('weak_topics').insert(weakEntries);
+        }
+      }
     }
     setLoading(false);
     navigate('/dashboard');
   };
 
-  if (showOnboarding) {
+  // Onboarding steps
+  if (onboardingStep > 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-center text-2xl">🎓 তোমার তথ্য দাও</CardTitle>
+            <div className="flex justify-center gap-2 mb-4">
+              {[1, 2, 3, 4].map((s) => (
+                <div key={s} className={`h-2 w-12 rounded-full transition-colors ${s <= onboardingStep ? 'bg-primary' : 'bg-muted'}`} />
+              ))}
+            </div>
+            <CardTitle className="text-center text-2xl">
+              {onboardingStep === 1 && '🎓 তোমার পরিচয়'}
+              {onboardingStep === 2 && '🎯 তোমার লক্ষ্য'}
+              {onboardingStep === 3 && '📅 পরীক্ষার তারিখ'}
+              {onboardingStep === 4 && '📚 দুর্বল বিষয়'}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label>তোমার নাম কী?</Label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="নাম লেখো" />
-            </div>
-            <div>
-              <Label>তুমি কোন ক্লাসে পড়?</Label>
-              <div className="flex gap-2 mt-2">
-                {['SSC', 'HSC', 'Admission'].map((level) => (
-                  <Button
-                    key={level}
-                    variant={classLevel === level ? 'default' : 'outline'}
-                    onClick={() => setClassLevel(level)}
-                    className="flex-1"
-                  >
-                    {level}
+            {/* Step 1: Name + Avatar */}
+            {onboardingStep === 1 && (
+              <>
+                <div>
+                  <Label>তোমার নাম কী?</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="নাম লেখো" />
+                </div>
+                <div>
+                  <Label>একটি ইমোজি অ্যাভাটার বেছে নাও</Label>
+                  <div className="grid grid-cols-6 gap-2 mt-2">
+                    {AVATARS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => setAvatarEmoji(emoji)}
+                        className={`text-2xl p-2 rounded-lg border transition-all ${avatarEmoji === emoji ? 'bg-primary/20 border-primary scale-110' : 'border-border hover:border-primary/50'}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Button className="w-full" onClick={() => { if (name) setOnboardingStep(2); else toast({ title: 'নাম লেখো', variant: 'destructive' }); }}>
+                  পরবর্তী →
+                </Button>
+              </>
+            )}
+
+            {/* Step 2: Target Exam */}
+            {onboardingStep === 2 && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  {EXAM_OPTIONS.map((exam) => (
+                    <button
+                      key={exam.id}
+                      onClick={() => setTargetExam(exam.id)}
+                      className={`p-3 rounded-xl border text-left transition-all ${
+                        targetExam === exam.id
+                          ? 'bg-primary text-primary-foreground border-primary shadow-lg'
+                          : 'bg-card border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <span className="text-xl block mb-1">{exam.icon}</span>
+                      <span className="text-sm font-medium">{exam.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setOnboardingStep(1)}>← আগে</Button>
+                  <Button className="flex-1" onClick={() => { if (targetExam) setOnboardingStep(3); else toast({ title: 'পরীক্ষা নির্বাচন করো', variant: 'destructive' }); }}>
+                    পরবর্তী →
                   </Button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <Label>তোমার লক্ষ্য কী?</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {['SSC 2025', 'HSC 2025', 'ঢাবি ভর্তি', 'বুয়েট ভর্তি', 'মেডিকেল ভর্তি'].map((exam) => (
-                  <Button
-                    key={exam}
-                    variant={targetExam === exam ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setTargetExam(exam)}
-                  >
-                    {exam}
+                </div>
+              </>
+            )}
+
+            {/* Step 3: Exam Date */}
+            {onboardingStep === 3 && (
+              <>
+                <Label>তোমার পরীক্ষা কবে?</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !examDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {examDate ? format(examDate, 'PPP') : 'তারিখ বেছে নাও'}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={examDate}
+                      onSelect={setExamDate}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+                {examDate && (
+                  <div className="text-center p-4 bg-primary/10 rounded-xl">
+                    <p className="text-2xl font-bold text-primary">
+                      পরীক্ষার আর {differenceInDays(examDate, new Date())} দিন বাকি 🔥
+                    </p>
+                  </div>
+                )}
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setOnboardingStep(2)}>← আগে</Button>
+                  <Button className="flex-1" onClick={() => setOnboardingStep(4)}>
+                    পরবর্তী →
                   </Button>
-                ))}
-              </div>
-            </div>
-            <Button className="w-full" onClick={handleOnboarding} disabled={loading}>
-              {loading ? 'সেভ হচ্ছে...' : 'শুরু করো 🚀'}
-            </Button>
+                </div>
+              </>
+            )}
+
+            {/* Step 4: Weak Subjects */}
+            {onboardingStep === 4 && (
+              <>
+                <p className="text-sm text-muted-foreground">কোন বিষয়গুলো কঠিন লাগে? (একাধিক বাছাই করতে পারো)</p>
+                <div className="flex flex-wrap gap-2">
+                  {subjects.map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setWeakSubjects(prev => prev.includes(s.id) ? prev.filter(x => x !== s.id) : [...prev, s.id])}
+                      className={`px-3 py-2 rounded-full border text-sm transition-all ${
+                        weakSubjects.includes(s.id)
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-card border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {s.icon} {s.name_bn}
+                    </button>
+                  ))}
+                  {subjects.length === 0 && <p className="text-sm text-muted-foreground">বিষয় লোড হচ্ছে...</p>}
+                </div>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setOnboardingStep(3)}>← আগে</Button>
+                  <Button className="flex-1" onClick={handleOnboardingComplete} disabled={loading}>
+                    {loading ? 'সেভ হচ্ছে...' : 'শুরু করো 🚀'}
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -8,7 +8,7 @@ import {
 import { NavLink } from '@/components/NavLink';
 import {
   LayoutDashboard, BookOpen, Lightbulb, PenTool, FileText,
-  BarChart3, CreditCard, Settings, LogOut, Menu, ClipboardList, Trophy,
+  BarChart3, CreditCard, Settings, LogOut, Menu, ClipboardList, Trophy, Camera,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import logo from '@/assets/logo.png';
 const navItems = [
   { title: 'ড্যাশবোর্ড', url: '/dashboard', icon: LayoutDashboard },
   { title: 'MCQ অনুশীলন', url: '/mcq', icon: BookOpen },
+  { title: '📸 ছবি থেকে সমাধান', url: '/photo-solve', icon: Camera },
   { title: 'বুঝিয়ে দাও', url: '/explain', icon: Lightbulb },
   { title: 'সৃজনশীল', url: '/srijonshil', icon: PenTool },
   { title: 'নোটবুক', url: '/notebook', icon: FileText },
@@ -35,6 +36,7 @@ function AppSidebarContent() {
 
   const planLabel = profile?.subscription_plan === 'premium' ? 'Premium' : profile?.subscription_plan === 'student' ? 'Student' : 'Free';
   const planColor = profile?.subscription_plan === 'premium' ? 'bg-secondary text-secondary-foreground' : profile?.subscription_plan === 'student' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground';
+  const avatarEmoji = (profile as any)?.avatar_emoji || '📚';
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -42,10 +44,10 @@ function AppSidebarContent() {
         {!collapsed && (
           <div className="p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="Admission AI" className="w-10 h-10 rounded-full" />
+              <span className="text-3xl">{avatarEmoji}</span>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{profile?.name || 'শিক্ষার্থী'}</p>
-                <p className="text-xs opacity-70">{profile?.class_level || 'ক্লাস নির্বাচন করুন'}</p>
+                <p className="text-xs opacity-70">{profile?.target_exam || profile?.class_level || 'ক্লাস নির্বাচন করুন'}</p>
               </div>
             </div>
             <Badge className={`mt-2 text-xs ${planColor}`}>{planLabel}</Badge>
@@ -114,6 +116,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
             {[
               { icon: LayoutDashboard, label: 'হোম', path: '/dashboard' },
               { icon: BookOpen, label: 'MCQ', path: '/mcq' },
+              { icon: Camera, label: 'ছবি সমাধান', path: '/photo-solve' },
               { icon: Lightbulb, label: 'বুঝিয়ে দাও', path: '/explain' },
               { icon: BarChart3, label: 'প্রগ্রেস', path: '/progress' },
             ].map((item) => (

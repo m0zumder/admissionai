@@ -11,7 +11,10 @@ type Profile = {
   daily_mcq_count: number;
   daily_explain_count: number;
   daily_srijonshil_count: number;
+  daily_photo_count: number;
   last_reset_date: string;
+  avatar_emoji: string | null;
+  exam_date: string | null;
 };
 
 type AuthContextType = {

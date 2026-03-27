@@ -16,9 +16,9 @@ const plans = [
       { text: "দিনে ১০টি MCQ", included: true },
       { text: "দিনে ৩টি topic explanation", included: true },
       { text: "দিনে ২টি সৃজনশীল", included: true },
+      { text: "দিনে ৩টি ছবি সমাধান", included: true },
       { text: "Mock Exam", included: false },
       { text: "Progress Analytics", included: false },
-      { text: "Photo Scan", included: false },
     ],
     cta: "এখনই শুরু করো",
     popular: false,
@@ -32,9 +32,9 @@ const plans = [
       { text: "সীমাহীন MCQ", included: true },
       { text: "সীমাহীন explanations", included: true },
       { text: "সীমাহীন সৃজনশীল", included: true },
+      { text: "দিনে ২০টি ছবি সমাধান", included: true },
       { text: "Full Mock Exams", included: true },
       { text: "Progress Analytics", included: true },
-      { text: "Photo Scan", included: false },
     ],
     cta: "এখনই নিন",
     popular: true,
@@ -46,7 +46,7 @@ const plans = [
     plan_id: "premium",
     features: [
       { text: "সব কিছু Student plan এ", included: true },
-      { text: "Photo/Image scan", included: true },
+      { text: "সীমাহীন ছবি সমাধান", included: true },
       { text: "Priority AI response", included: true },
       { text: "Personalized study plan", included: true },
       { text: "WhatsApp support", included: true },
@@ -63,35 +63,18 @@ const PricingPage: React.FC = () => {
 
   const handlePayment = async (planId: string) => {
     if (planId === "free") return;
-
-    if (!session) {
-      toast.error("পেমেন্ট করতে প্রথমে লগ ইন করো");
-      return;
-    }
-
-    if (profile?.subscription_plan === planId) {
-      toast.info("তুমি ইতিমধ্যে এই প্ল্যানে আছো!");
-      return;
-    }
+    if (!session) { toast.error("পেমেন্ট করতে প্রথমে লগ ইন করো"); return; }
+    if (profile?.subscription_plan === planId) { toast.info("তুমি ইতিমধ্যে এই প্ল্যানে আছো!"); return; }
 
     setLoadingPlan(planId);
     try {
-      const { data, error } = await supabase.functions.invoke("init-payment", {
-        body: { plan: planId },
-      });
-
+      const { data, error } = await supabase.functions.invoke("init-payment", { body: { plan: planId } });
       if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error("No payment URL received");
-      }
+      if (data?.url) { window.location.href = data.url; } else { throw new Error("No payment URL received"); }
     } catch (err: any) {
       console.error("Payment error:", err);
       toast.error("পেমেন্ট শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করো।");
-    } finally {
-      setLoadingPlan(null);
-    }
+    } finally { setLoadingPlan(null); }
   };
 
   return (
@@ -100,21 +83,14 @@ const PricingPage: React.FC = () => {
         <h2 className="text-3xl font-bold mb-2">সাশ্রয়ী মূল্যে পড়াশোনা</h2>
         <p className="text-muted-foreground">তোমার পড়াশোনার জন্য সেরা প্ল্যান বেছে নাও</p>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {plans.map((plan) => {
           const isCurrentPlan = profile?.subscription_plan === plan.plan_id;
           const isLoading = loadingPlan === plan.plan_id;
-
           return (
-            <Card
-              key={plan.name}
-              className={`relative ${plan.popular ? "border-2 border-secondary shadow-xl scale-105" : "border-border"}`}
-            >
+            <Card key={plan.name} className={`relative ${plan.popular ? "border-2 border-secondary shadow-xl scale-105" : "border-border"}`}>
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  সবচেয়ে জনপ্রিয়
-                </div>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full">সবচেয়ে জনপ্রিয়</div>
               )}
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-sm text-muted-foreground">{plan.name}</CardTitle>
@@ -127,24 +103,13 @@ const PricingPage: React.FC = () => {
                 <ul className="space-y-2">
                   {plan.features.map((f) => (
                     <li key={f.text} className="flex items-center gap-2 text-sm">
-                      {f.included ? (
-                        <Check className="h-4 w-4 text-success flex-shrink-0" />
-                      ) : (
-                        <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      )}
+                      {f.included ? <Check className="h-4 w-4 text-success flex-shrink-0" /> : <X className="h-4 w-4 text-muted-foreground flex-shrink-0" />}
                       <span className={f.included ? "" : "text-muted-foreground"}>{f.text}</span>
                     </li>
                   ))}
                 </ul>
-                <Button
-                  className="w-full"
-                  variant={plan.popular ? "default" : "outline"}
-                  disabled={isCurrentPlan || isLoading || plan.plan_id === "free"}
-                  onClick={() => handlePayment(plan.plan_id)}
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : null}
+                <Button className="w-full" variant={plan.popular ? "default" : "outline"} disabled={isCurrentPlan || isLoading || plan.plan_id === "free"} onClick={() => handlePayment(plan.plan_id)}>
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                   {isCurrentPlan ? "✓ বর্তমান প্ল্যান" : plan.cta}
                 </Button>
               </CardContent>
@@ -152,7 +117,6 @@ const PricingPage: React.FC = () => {
           );
         })}
       </div>
-
       <div className="text-center">
         <Card className="inline-block">
           <CardContent className="p-6">

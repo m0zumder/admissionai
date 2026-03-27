@@ -169,11 +169,14 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_emoji: string | null
           class_level: string | null
           created_at: string
           daily_explain_count: number
           daily_mcq_count: number
+          daily_photo_count: number
           daily_srijonshil_count: number
+          exam_date: string | null
           id: string
           last_reset_date: string
           name: string | null
@@ -181,11 +184,14 @@ export type Database = {
           target_exam: string | null
         }
         Insert: {
+          avatar_emoji?: string | null
           class_level?: string | null
           created_at?: string
           daily_explain_count?: number
           daily_mcq_count?: number
+          daily_photo_count?: number
           daily_srijonshil_count?: number
+          exam_date?: string | null
           id: string
           last_reset_date?: string
           name?: string | null
@@ -193,11 +199,14 @@ export type Database = {
           target_exam?: string | null
         }
         Update: {
+          avatar_emoji?: string | null
           class_level?: string | null
           created_at?: string
           daily_explain_count?: number
           daily_mcq_count?: number
+          daily_photo_count?: number
           daily_srijonshil_count?: number
+          exam_date?: string | null
           id?: string
           last_reset_date?: string
           name?: string | null
@@ -234,6 +243,7 @@ export type Database = {
         Row: {
           chapter_number: number
           id: string
+          importance: string
           name_bn: string
           name_en: string
           subject_id: string
@@ -241,6 +251,7 @@ export type Database = {
         Insert: {
           chapter_number?: number
           id?: string
+          importance?: string
           name_bn: string
           name_en: string
           subject_id: string
@@ -248,6 +259,7 @@ export type Database = {
         Update: {
           chapter_number?: number
           id?: string
+          importance?: string
           name_bn?: string
           name_en?: string
           subject_id?: string
