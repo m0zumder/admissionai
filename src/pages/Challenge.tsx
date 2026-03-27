@@ -29,7 +29,8 @@ const ChallengePage: React.FC = () => {
     const { data } = await supabase.from('challenges' as any).select('*').eq('code', code).single();
     if (data) {
       setChallenge(data);
-      const qs = typeof data.questions === 'string' ? JSON.parse(data.questions) : data.questions;
+      const d = data as any;
+      const qs = typeof d.questions === 'string' ? JSON.parse(d.questions) : d.questions;
       setQuestions(qs || []);
       setAnswers(new Array(qs?.length || 0).fill(null));
       setStep('quiz');
