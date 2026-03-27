@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
 import { Copy, Check } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const hscSubjects = ['বাংলা', 'ইংরেজি', 'পদার্থবিজ্ঞান', 'রসায়ন', 'জীববিজ্ঞান', 'গণিত', 'হিসাববিজ্ঞান', 'অর্থনীতি'];
 
@@ -69,7 +70,7 @@ const SrijonshilPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0">
-      <h2 className="text-2xl font-bold">✍️ সৃজনশীল উত্তর Builder</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="pen-fancy" className="mr-2 text-primary" />সৃজনশীল উত্তর Builder</h2>
       <p className="text-muted-foreground">উদ্দীপক দাও → সম্পূর্ণ ক, খ, গ, ঘ উত্তর পাও</p>
 
       <Select value={subject} onValueChange={setSubject}>
@@ -89,7 +90,7 @@ const SrijonshilPage: React.FC = () => {
       />
 
       <Button className="w-full" size="lg" onClick={handleGenerate} disabled={loading || !uddipok.trim() || !subject}>
-        {loading ? <ThinkingDots /> : 'উত্তর তৈরি করো ✨'}
+        {loading ? <ThinkingDots /> : <><FontAwesomeIcon icon="wand-magic-sparkles" className="mr-2" />উত্তর তৈরি করো</>}
       </Button>
 
       {result && (
@@ -114,7 +115,7 @@ const SrijonshilPage: React.FC = () => {
             </Card>
           ))}
           <Button variant="outline" className="w-full" onClick={() => window.print()}>
-            📄 PDF হিসেবে Save করো
+            <FontAwesomeIcon icon="file-pdf" className="mr-2" />PDF হিসেবে Save করো
           </Button>
         </div>
       )}

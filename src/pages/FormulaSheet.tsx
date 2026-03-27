@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Bookmark, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type Formula = { name: string; formula: string; unit?: string; example?: string; chapter?: string };
 
@@ -107,7 +108,7 @@ const FormulaSheet: React.FC = () => {
         <div className="flex justify-between items-start">
           <h3 className="font-bold text-sm">{f.name}</h3>
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => handleBookmark(f)}>
-            <Bookmark className="h-4 w-4" />
+            <FontAwesomeIcon icon="bookmark" className="h-4 w-4" />
           </Button>
         </div>
         <p className="text-lg font-mono bg-muted px-3 py-2 rounded-lg">{f.formula}</p>
@@ -120,7 +121,7 @@ const FormulaSheet: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📐 সূত্র ও সংজ্ঞা — দ্রুত রেফারেন্স</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="ruler-combined" className="mr-2 text-primary" />সূত্র ও সংজ্ঞা — দ্রুত রেফারেন্স</h2>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -129,10 +130,10 @@ const FormulaSheet: React.FC = () => {
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="physics">⚡ পদার্থ</TabsTrigger>
-          <TabsTrigger value="chemistry">🧪 রসায়ন</TabsTrigger>
-          <TabsTrigger value="math">📐 গণিত</TabsTrigger>
-          <TabsTrigger value="biology">🌱 জীববিজ্ঞান</TabsTrigger>
+          <TabsTrigger value="physics"><FontAwesomeIcon icon="bolt" className="mr-1" />পদার্থ</TabsTrigger>
+          <TabsTrigger value="chemistry"><FontAwesomeIcon icon="flask" className="mr-1" />রসায়ন</TabsTrigger>
+          <TabsTrigger value="math"><FontAwesomeIcon icon="ruler-combined" className="mr-1" />গণিত</TabsTrigger>
+          <TabsTrigger value="biology"><FontAwesomeIcon icon="seedling" className="mr-1" />জীববিজ্ঞান</TabsTrigger>
         </TabsList>
 
         {Object.entries(allFormulas).map(([key, formulas]) => (
@@ -146,7 +147,7 @@ const FormulaSheet: React.FC = () => {
 
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="p-6">
-          <h3 className="font-bold text-lg mb-4">🎯 পরীক্ষায় অবশ্যই মনে রাখতে হবে — শীর্ষ ২০ সূত্র</h3>
+          <h3 className="font-bold text-lg mb-4"><FontAwesomeIcon icon="bullseye" className="mr-2 text-primary" />পরীক্ষায় অবশ্যই মনে রাখতে হবে — শীর্ষ ২০ সূত্র</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {TOP_20.map((f, i) => (
               <div key={i} className="flex items-center gap-2 p-2 bg-card rounded-lg text-sm">
@@ -160,7 +161,7 @@ const FormulaSheet: React.FC = () => {
       </Card>
 
       <Button variant="outline" className="w-full" onClick={() => window.print()}>
-        📥 PDF হিসেবে Download করো
+        <FontAwesomeIcon icon="file-export" className="mr-2" />PDF হিসেবে Download করো
       </Button>
     </div>
   );

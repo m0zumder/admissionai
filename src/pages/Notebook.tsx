@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, FileText, MessageCircle, BookOpen, Trash2, Send, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type LocalDoc = { id: string; name: string; content: string; size: number; addedAt: string };
@@ -36,7 +37,6 @@ const NotebookPage: React.FC = () => {
       reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       if (file.type.startsWith('image/')) {
-        // For images, we'll just note the filename
         resolve(`[ছবি: ${file.name}]`);
       } else {
         reader.readAsText(file);
@@ -59,7 +59,7 @@ const NotebookPage: React.FC = () => {
         const doc: LocalDoc = {
           id: crypto.randomUUID(),
           name: file.name,
-          content: content.slice(0, 50000), // limit context
+          content: content.slice(0, 50000),
           size: file.size,
           addedAt: new Date().toISOString(),
         };
@@ -191,7 +191,7 @@ const NotebookPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📓 আমার নোটবুক</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="book" className="mr-2 text-primary" />আমার নোটবুক</h2>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
@@ -216,14 +216,7 @@ const NotebookPage: React.FC = () => {
                 <Upload className="h-10 w-10 mx-auto mb-3 text-primary/60" />
                 <p className="font-semibold text-sm">ডকুমেন্ট আপলোড করুন</p>
                 <p className="text-xs text-muted-foreground mt-1">টেক্সট ফাইল (.txt, .md) সর্বোচ্চ ৫MB</p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  multiple
-                  accept=".txt,.md,.csv,.json"
-                  onChange={handleUpload}
-                />
+                <input ref={fileInputRef} type="file" className="hidden" multiple accept=".txt,.md,.csv,.json" onChange={handleUpload} />
                 {uploading && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-primary">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -256,12 +249,7 @@ const NotebookPage: React.FC = () => {
                         <p className="text-xs text-muted-foreground">{formatSize(doc.size)}</p>
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 text-destructive hover:text-destructive"
-                      onClick={() => handleDelete(doc.id)}
-                    >
+                    <Button variant="ghost" size="icon" className="shrink-0 text-destructive hover:text-destructive" onClick={() => handleDelete(doc.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </CardContent>
@@ -284,13 +272,7 @@ const NotebookPage: React.FC = () => {
                 )}
                 {chatMessages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${
-                        msg.role === 'user'
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-muted rounded-bl-md'
-                      }`}
-                    >
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-muted rounded-bl-md'}`}>
                       {msg.content}
                     </div>
                   </div>
@@ -305,13 +287,7 @@ const NotebookPage: React.FC = () => {
                 <div ref={chatEndRef} />
               </div>
               <div className="border-t p-3 flex gap-2">
-                <Input
-                  placeholder="আপনার প্রশ্ন লিখুন..."
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendChat()}
-                  disabled={isChatLoading}
-                />
+                <Input placeholder="আপনার প্রশ্ন লিখুন..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendChat()} disabled={isChatLoading} />
                 <Button size="icon" onClick={sendChat} disabled={isChatLoading || !chatInput.trim()} className="btn-ripple shrink-0">
                   <Send className="h-4 w-4" />
                 </Button>
@@ -329,27 +305,17 @@ const NotebookPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                আপলোড করা ডকুমেন্টের উপর ভিত্তি করে AI স্বয়ংক্রিয়ভাবে একটি স্টাডি গাইড তৈরি করবে।
-              </p>
-              <Button
-                onClick={generateStudyGuide}
-                disabled={isGeneratingGuide || documents.length === 0}
-                className="btn-ripple w-full"
-              >
+              <p className="text-sm text-muted-foreground">আপলোড করা ডকুমেন্টের উপর ভিত্তি করে AI স্বয়ংক্রিয়ভাবে একটি স্টাডি গাইড তৈরি করবে।</p>
+              <Button onClick={generateStudyGuide} disabled={isGeneratingGuide || documents.length === 0} className="btn-ripple w-full">
                 {isGeneratingGuide ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> তৈরি হচ্ছে...</>
                 ) : (
                   <><Sparkles className="h-4 w-4" /> স্টাডি গাইড তৈরি করো</>
                 )}
               </Button>
-
               {studyGuide && (
-                <div className="mt-4 p-4 bg-muted rounded-xl text-sm whitespace-pre-wrap leading-relaxed">
-                  {studyGuide}
-                </div>
+                <div className="mt-4 p-4 bg-muted rounded-xl text-sm whitespace-pre-wrap leading-relaxed">{studyGuide}</div>
               )}
-
               {!studyGuide && !isGeneratingGuide && documents.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />

@@ -13,6 +13,7 @@ import { Progress } from '@/components/ui/progress';
 import { ThinkingDots } from '@/components/SharedUI';
 import { useXP } from '@/hooks/useXP';
 import { useToast } from '@/hooks/use-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type DayPlan = { date: string; tasks: { subject: string; chapter: string; minutes: number; done: boolean }[] };
 
@@ -44,7 +45,6 @@ const PlannerPage: React.FC = () => {
     if (!examDate) return;
     setLoading(true);
 
-    // Generate a simple study plan locally
     const subjects = ['পদার্থবিজ্ঞান', 'রসায়ন', 'গণিত', 'জীববিজ্ঞান', 'ইংরেজি'];
     const chapters: Record<string, string[]> = {
       'পদার্থবিজ্ঞান': ['গতি', 'বল', 'কাজ-শক্তি', 'তাপ', 'আলো', 'বিদ্যুৎ'],
@@ -60,7 +60,6 @@ const PlannerPage: React.FC = () => {
 
     for (let i = 0; i < days; i++) {
       const date = addDays(new Date(), i + 1);
-      const dayName = date.toLocaleDateString('bn-BD', { weekday: 'long' });
       if ((daysOff.includes('fri') && date.getDay() === 5) || (daysOff.includes('sat') && date.getDay() === 6)) continue;
 
       const tasks = [];
@@ -74,7 +73,6 @@ const PlannerPage: React.FC = () => {
         const chap = chaps[(i + j) % chaps.length];
         tasks.push({ subject: sub, chapter: chap, minutes: minutesPer, done: false });
       }
-      // Add MCQ practice
       tasks.push({ subject: 'MCQ অনুশীলন', chapter: `${10 + (i % 10) * 5}টি MCQ`, minutes: 20, done: false });
 
       newPlan.push({ date: format(date, 'yyyy-MM-dd'), tasks });
@@ -95,7 +93,6 @@ const PlannerPage: React.FC = () => {
     }
     setCheckedTasks(newChecked);
 
-    // Check if all today's tasks are done
     if (dateStr === todayStr && todayPlan) {
       const allDone = todayPlan.tasks.every((_, i) => newChecked.has(`${dateStr}-${i}`) || checkedTasks.has(`${dateStr}-${i}`));
       if (allDone && !showConfetti) {
@@ -113,12 +110,12 @@ const PlannerPage: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📅 তোমার পড়ার পরিকল্পনা</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="calendar-days" className="mr-2 text-primary" />তোমার পড়ার পরিকল্পনা</h2>
       <p className="text-muted-foreground">পরীক্ষার তারিখ দাও, AI বাকিটা সাজিয়ে দেবে</p>
 
       {showConfetti && (
         <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center">
-          <div className="text-6xl animate-bounce-in">🎉🎊🥳</div>
+          <div className="text-6xl animate-bounce-in"><FontAwesomeIcon icon="champagne-glasses" className="text-secondary" /></div>
         </div>
       )}
 
@@ -150,7 +147,7 @@ const PlannerPage: React.FC = () => {
                   <Calendar mode="single" selected={examDate} onSelect={setExamDate} disabled={d => d < new Date()} initialFocus className="p-3 pointer-events-auto" />
                 </PopoverContent>
               </Popover>
-              {examDate && <p className="text-sm text-primary font-semibold mt-2">পরীক্ষার আর {daysLeft} দিন বাকি 🔥</p>}
+              {examDate && <p className="text-sm text-primary font-semibold mt-2">পরীক্ষার আর {daysLeft} দিন বাকি <FontAwesomeIcon icon="fire" className="text-orange-500" /></p>}
             </div>
 
             <div>
@@ -175,13 +172,12 @@ const PlannerPage: React.FC = () => {
             </div>
 
             <Button className="w-full" size="lg" onClick={generatePlan} disabled={loading || !examDate}>
-              {loading ? <ThinkingDots /> : 'পরিকল্পনা তৈরি করো 📅'}
+              {loading ? <ThinkingDots /> : <><FontAwesomeIcon icon="calendar-days" className="mr-2" />পরিকল্পনা তৈরি করো</>}
             </Button>
           </CardContent>
         </Card>
       ) : (
         <>
-          {/* Progress overview */}
           <Card className="card-hover">
             <CardContent className="p-6 space-y-3">
               <div className="flex justify-between items-center">
@@ -192,10 +188,9 @@ const PlannerPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Today's tasks */}
           {todayPlan && (
             <Card className="border-primary/30">
-              <CardHeader><CardTitle className="text-lg">📋 আজকের কাজ</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon="clipboard" className="mr-2 text-primary" />আজকের কাজ</CardTitle></CardHeader>
               <CardContent className="space-y-3">
                 {todayPlan.tasks.map((task, i) => {
                   const key = `${todayStr}-${i}`;
@@ -218,9 +213,8 @@ const PlannerPage: React.FC = () => {
             </Card>
           )}
 
-          {/* Calendar preview - next 7 days */}
           <Card>
-            <CardHeader><CardTitle className="text-lg">📅 আগামী সপ্তাহ</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon="calendar-days" className="mr-2 text-primary" />আগামী সপ্তাহ</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {plan.slice(0, 7).map(day => (

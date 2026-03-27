@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, Legend, Area, AreaChart } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Area, AreaChart, Legend } from 'recharts';
 import { format, subDays, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const ProgressPage: React.FC = () => {
   const { profile } = useAuth();
@@ -35,7 +36,6 @@ const ProgressPage: React.FC = () => {
       const uniqueDays = new Set(sessions.map(s => s.created_at.split('T')[0])).size;
       setStats({ totalMcq, totalCorrect, avgScore, studyDays: uniqueDays });
 
-      // Subject performance
       const subjectMap: Record<string, { total: number; correct: number }> = {};
       sessions.forEach((s) => {
         const name = (s as any).subjects?.name_bn || 'অন্যান্য';
@@ -50,25 +50,22 @@ const ProgressPage: React.FC = () => {
       })));
     }
 
-      // Weekly activity from real data
-      const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const date = subDays(new Date(), 6 - i);
-        const dateStr = format(date, 'yyyy-MM-dd');
-        const dayLabel = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'][date.getDay()];
-        const daySessions = sessions.filter(s => s.created_at.startsWith(dateStr));
-        return { day: dayLabel, mcq: daySessions.reduce((a, s) => a + s.questions_attempted, 0) };
-      });
-      setWeeklyData(last7Days);
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = subDays(new Date(), 6 - i);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const dayLabel = ['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'][date.getDay()];
+      const daySessions = sessions.filter(s => s.created_at.startsWith(dateStr));
+      return { day: dayLabel, mcq: daySessions.reduce((a, s) => a + s.questions_attempted, 0) };
+    });
+    setWeeklyData(last7Days);
 
-      // Score trend over time (all sessions chronologically)
-      const sorted = [...sessions].sort((a, b) => a.created_at.localeCompare(b.created_at));
-      setScoreTrend(sorted.map((s, i) => ({
-        label: format(parseISO(s.created_at), 'dd/MM'),
-        score: Math.round(s.score_percentage),
-        avg: Math.round(sorted.slice(0, i + 1).reduce((a, x) => a + x.score_percentage, 0) / (i + 1)),
-      })));
+    const sorted = [...sessions].sort((a, b) => a.created_at.localeCompare(b.created_at));
+    setScoreTrend(sorted.map((s, i) => ({
+      label: format(parseISO(s.created_at), 'dd/MM'),
+      score: Math.round(s.score_percentage),
+      avg: Math.round(sorted.slice(0, i + 1).reduce((a, x) => a + x.score_percentage, 0) / (i + 1)),
+    })));
 
-    // Weak topics
     const { data: weak } = await supabase
       .from('weak_topics')
       .select('*, topics(name_bn)')
@@ -79,9 +76,8 @@ const ProgressPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
-      <h2 className="text-2xl font-bold">📊 তোমার প্রগ্রেস</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="chart-bar" className="mr-2 text-primary" />তোমার প্রগ্রেস</h2>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'মোট MCQ', value: stats.totalMcq },
@@ -98,7 +94,6 @@ const ProgressPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Weekly chart */}
       <Card>
         <CardHeader><CardTitle className="text-lg">সাপ্তাহিক কার্যকলাপ</CardTitle></CardHeader>
         <CardContent>
@@ -116,10 +111,9 @@ const ProgressPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Mock Exam Score Trend */}
       {scoreTrend.length > 0 && (
         <Card>
-          <CardHeader><CardTitle className="text-lg">📈 পরীক্ষার স্কোর ট্রেন্ড</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon="chart-line" className="mr-2 text-primary" />পরীক্ষার স্কোর ট্রেন্ড</CardTitle></CardHeader>
           <CardContent>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
@@ -138,7 +132,6 @@ const ProgressPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Radar chart */}
       {subjectData.length > 0 && (
         <Card>
           <CardHeader><CardTitle className="text-lg">বিষয়ভিত্তিক পারফরম্যান্স</CardTitle></CardHeader>
@@ -157,7 +150,6 @@ const ProgressPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Weak topics */}
       <Card>
         <CardHeader><CardTitle className="text-lg">দুর্বল বিষয়সমূহ</CardTitle></CardHeader>
         <CardContent>
@@ -181,16 +173,15 @@ const ProgressPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Achievements */}
       <Card>
-        <CardHeader><CardTitle className="text-lg">🏆 অর্জন</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon="trophy" className="mr-2 text-secondary" />অর্জন</CardTitle></CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { emoji: '📝', title: 'প্রথম ১০০ MCQ', unlocked: stats.totalMcq >= 100 },
-              { emoji: '🔥', title: '৭ দিন Streak', unlocked: stats.studyDays >= 7 },
-              { emoji: '🎯', title: '৯০%+ স্কোর', unlocked: stats.avgScore >= 90 },
-              { emoji: '📚', title: '৫০০ MCQ', unlocked: stats.totalMcq >= 500 },
+              { icon: 'pen-to-square' as const, title: 'প্রথম ১০০ MCQ', unlocked: stats.totalMcq >= 100 },
+              { icon: 'fire' as const, title: '৭ দিন Streak', unlocked: stats.studyDays >= 7 },
+              { icon: 'bullseye' as const, title: '৯০%+ স্কোর', unlocked: stats.avgScore >= 90 },
+              { icon: 'book' as const, title: '৫০০ MCQ', unlocked: stats.totalMcq >= 500 },
             ].map((a) => (
               <div
                 key={a.title}
@@ -198,7 +189,7 @@ const ProgressPage: React.FC = () => {
                   a.unlocked ? 'border-secondary bg-secondary/10' : 'border-border opacity-40'
                 }`}
               >
-                <div className="text-2xl mb-1">{a.emoji}</div>
+                <div className="text-2xl mb-1 text-primary"><FontAwesomeIcon icon={a.icon} /></div>
                 <p className="text-xs font-medium">{a.title}</p>
               </div>
             ))}

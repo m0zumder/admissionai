@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThinkingDots } from '@/components/SharedUI';
 import { useXP } from '@/hooks/useXP';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type MCQQuestion = { question: string; options: { text: string; isCorrect: boolean }[]; explanation: string };
 
@@ -64,7 +65,6 @@ const ChallengePage: React.FC = () => {
         isCreator ? { creator_score: score } : { opponent_id: user.id, opponent_score: score, status: 'completed' }
       ).eq('id', challenge.id);
 
-      // Check if won
       if (!isCreator && challenge.creator_score !== null && score > challenge.creator_score) {
         await addXP(200);
       } else {
@@ -83,7 +83,9 @@ const ChallengePage: React.FC = () => {
       <div className="max-w-md mx-auto text-center space-y-6 pb-20 md:pb-0 animate-fade-in">
         <Card className="card-hover">
           <CardContent className="p-8 space-y-4">
-            <div className="text-6xl">{myScore > (opponentScore ?? -1) ? '🏆' : myScore === opponentScore ? '🤝' : '💪'}</div>
+            <div className="text-6xl text-primary">
+              {myScore > (opponentScore ?? -1) ? <FontAwesomeIcon icon="trophy" /> : myScore === opponentScore ? <FontAwesomeIcon icon="handshake" /> : <FontAwesomeIcon icon="dumbbell" />}
+            </div>
             <h2 className="text-2xl font-bold">চ্যালেঞ্জ ফলাফল</h2>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-primary/10 rounded-xl">
@@ -95,7 +97,7 @@ const ChallengePage: React.FC = () => {
                 <p className="text-3xl font-bold">{opponentScore !== null && opponentScore !== undefined ? `${opponentScore}/${questions.length}` : 'অপেক্ষায়...'}</p>
               </div>
             </div>
-            {myScore > (opponentScore ?? -1) && opponentScore !== null && <p className="text-primary font-bold">তুমি জিতেছো! 🏆 +200 XP</p>}
+            {myScore > (opponentScore ?? -1) && opponentScore !== null && <p className="text-primary font-bold"><FontAwesomeIcon icon="trophy" className="mr-1" />তুমি জিতেছো! +200 XP</p>}
           </CardContent>
         </Card>
         <Button onClick={() => navigate('/mcq')}>MCQ পেজে ফিরে যাও</Button>
@@ -109,7 +111,7 @@ const ChallengePage: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold">⚔️ চ্যালেঞ্জ — প্রশ্ন {currentQ + 1}/{questions.length}</span>
+        <span className="text-sm font-semibold"><FontAwesomeIcon icon="shield-halved" className="mr-1 text-primary" /> চ্যালেঞ্জ — প্রশ্ন {currentQ + 1}/{questions.length}</span>
         <span className="text-sm text-primary font-semibold">{challenge?.subject_name}</span>
       </div>
       <div className="w-full bg-muted rounded-full h-2">
@@ -139,7 +141,7 @@ const ChallengePage: React.FC = () => {
       </Card>
       {selectedAnswer !== null && (
         <Button className="w-full" onClick={nextQ}>
-          {currentQ + 1 >= questions.length ? 'ফলাফল দেখো' : 'পরের প্রশ্ন →'}
+          {currentQ + 1 >= questions.length ? 'ফলাফল দেখো' : <>পরের প্রশ্ন <FontAwesomeIcon icon="arrow-right" className="ml-1" /></>}
         </Button>
       )}
     </div>
