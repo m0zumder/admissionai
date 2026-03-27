@@ -31,7 +31,7 @@ type ExamPreset = {
 
 const EXAM_PRESETS: Record<string, ExamPreset> = {
   medical: {
-    label: 'Medical ভর্তি', icon: 'hospital' as const,
+    label: 'Medical ভর্তি',
     duration: 60 * 60,
     questionCount: 100,
     classLevel: 'Admission',
