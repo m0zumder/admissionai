@@ -222,6 +222,7 @@ export type Database = {
           id: string
           name_bn: string
           name_en: string
+          stream: string | null
         }
         Insert: {
           class_level: string
@@ -229,6 +230,7 @@ export type Database = {
           id?: string
           name_bn: string
           name_en: string
+          stream?: string | null
         }
         Update: {
           class_level?: string
@@ -236,6 +238,7 @@ export type Database = {
           id?: string
           name_bn?: string
           name_en?: string
+          stream?: string | null
         }
         Relationships: []
       }
