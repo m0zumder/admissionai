@@ -30,6 +30,7 @@ const DashboardPage: React.FC = () => {
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<{ title: string; path: string }[]>([]);
+  const [parentMessage, setParentMessage] = useState<any>(null);
 
   const todayTip = useMemo(() => {
     const dayIndex = Math.floor(Date.now() / 86400000) % STUDY_TIPS.length;
