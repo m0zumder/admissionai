@@ -4,8 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BookOpen, Target, AlertTriangle, Flame, Lightbulb } from 'lucide-react';
+import { BookOpen, Target, AlertTriangle, Flame, Lightbulb, Zap } from 'lucide-react';
+import { getLevelProgress } from '@/hooks/useXP';
+import { useXP } from '@/hooks/useXP';
 
 const STUDY_TIPS = [
   "📌 প্রতিদিন অন্তত ৩০ মিনিট MCQ অনুশীলন করো — ধারাবাহিকতাই সাফল্যের চাবিকাঠি।",
@@ -22,19 +25,46 @@ const STUDY_TIPS = [
 
 const DashboardPage: React.FC = () => {
   const { profile } = useAuth();
+  const { addXP, checkAndAwardBadges } = useXP();
   const [recentSessions, setRecentSessions] = useState<any[]>([]);
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   const [weakTopics, setWeakTopics] = useState<any[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<{ title: string; path: string }[]>([]);
 
   const todayTip = useMemo(() => {
     const dayIndex = Math.floor(Date.now() / 86400000) % STUDY_TIPS.length;
     return STUDY_TIPS[dayIndex];
   }, []);
 
+  const xp = (profile as any)?.xp_points || 0;
+  const streak = (profile as any)?.study_streak || 0;
+  const level = (profile as any)?.user_level || 'নবীন 📖';
+  const { progress, xpNeeded, next } = getLevelProgress(xp);
+  const today = new Date().toISOString().split('T')[0];
+  const lastActivity = (profile as any)?.last_activity_date;
+  const hasStudiedToday = lastActivity === today;
+
   useEffect(() => {
     if (!profile) return;
     loadData();
+    // Daily login XP
+    if (!hasStudiedToday) {
+      addXP(5);
+    }
+    checkAndAwardBadges();
+
+    // Load recently viewed from localStorage
+    const rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    setRecentlyViewed(rv.slice(0, 5));
   }, [profile]);
+
+  // Track page visit
+  useEffect(() => {
+    const existing = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    const entry = { title: 'ড্যাশবোর্ড', path: '/dashboard' };
+    const filtered = existing.filter((e: any) => e.path !== entry.path);
+    localStorage.setItem('recentlyViewed', JSON.stringify([entry, ...filtered].slice(0, 10)));
+  }, []);
 
   const loadData = async () => {
     const { data: sessions } = await supabase
@@ -64,6 +94,37 @@ const DashboardPage: React.FC = () => {
     <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
       <h2 className="text-2xl font-bold">স্বাগতম, {profile?.name || 'শিক্ষার্থী'} 👋</h2>
 
+      {/* XP + Level + Streak bar */}
+      <Card className="card-hover overflow-hidden">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10"><Zap className="h-5 w-5 text-primary" /></div>
+              <div>
+                <p className="font-bold text-sm">{level}</p>
+                <p className="text-xs text-muted-foreground">{xp} XP</p>
+              </div>
+            </div>
+            {streak > 0 ? (
+              <div className="text-center">
+                <p className="text-2xl font-bold text-orange-500">🔥 {streak} দিনের Streak!</p>
+              </div>
+            ) : !hasStudiedToday ? (
+              <p className="text-sm text-destructive animate-pulse font-semibold">⚠️ আজ পড়োনি! Streak হারাবে</p>
+            ) : null}
+          </div>
+          {next && (
+            <div className="mt-3">
+              <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                <span>পরের level: {next.name}</span>
+                <span>আর {xpNeeded} XP বাকি</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Tip of the Day */}
       <Card className="card-hover border-secondary/30 bg-secondary/5">
         <CardContent className="p-4 flex items-start gap-3">
@@ -76,6 +137,24 @@ const DashboardPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Recently Viewed */}
+      {recentlyViewed.length > 1 && (
+        <div>
+          <p className="font-semibold text-sm mb-2">📍 যেখানে ছিলে সেখান থেকে শুরু করো</p>
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {recentlyViewed.filter(r => r.path !== '/dashboard').map((r, i) => (
+              <Link key={i} to={r.path} className="shrink-0">
+                <Card className="card-hover w-36">
+                  <CardContent className="p-3 text-center">
+                    <p className="text-sm font-medium truncate">{r.title}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -90,7 +169,7 @@ const DashboardPage: React.FC = () => {
         </Card>
         <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-success/10"><Target className="h-5 w-5 text-success" /></div>
+            <div className="p-2 rounded-lg bg-green-500/10"><Target className="h-5 w-5 text-green-600" /></div>
             <div>
               <p className="text-xs text-muted-foreground">সঠিক উত্তর</p>
               <p className="text-lg font-bold">
@@ -115,7 +194,7 @@ const DashboardPage: React.FC = () => {
             <div className="p-2 rounded-lg bg-secondary/10"><Flame className="h-5 w-5 text-secondary" /></div>
             <div>
               <p className="text-xs text-muted-foreground">Study Streak</p>
-              <p className="text-lg font-bold">3 দিন</p>
+              <p className="text-lg font-bold">{streak} দিন</p>
             </div>
           </CardContent>
         </Card>
@@ -128,6 +207,8 @@ const DashboardPage: React.FC = () => {
           <Link to="/mcq"><Button className="btn-ripple">MCQ অনুশীলন</Button></Link>
           <Link to="/explain"><Button variant="outline" className="btn-ripple">বুঝিয়ে দাও</Button></Link>
           <Link to="/srijonshil"><Button variant="outline" className="btn-ripple">সৃজনশীল Builder</Button></Link>
+          <Link to="/formula-sheet"><Button variant="outline" className="btn-ripple">📐 সূত্র শীট</Button></Link>
+          <Link to="/planner"><Button variant="outline" className="btn-ripple">📅 পড়ার পরিকল্পনা</Button></Link>
         </CardContent>
       </Card>
 
