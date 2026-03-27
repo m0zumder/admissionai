@@ -19,6 +19,8 @@ import Settings from "./pages/Settings";
 import Notebook from "./pages/Notebook";
 import Leaderboard from "./pages/Leaderboard";
 import PhotoSolve from "./pages/PhotoSolve";
+import CustomExam from "./pages/CustomExam";
+import ChanceCalculator from "./pages/ChanceCalculator";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFail from "./pages/PaymentFail";
 import NotFound from "./pages/NotFound";
@@ -58,6 +60,8 @@ const App = () => (
             <Route path="/explain" element={<DashboardRoute><Explain /></DashboardRoute>} />
             <Route path="/srijonshil" element={<DashboardRoute><Srijonshil /></DashboardRoute>} />
             <Route path="/mock-exam" element={<DashboardRoute><MockExam /></DashboardRoute>} />
+            <Route path="/custom-exam" element={<DashboardRoute><CustomExam /></DashboardRoute>} />
+            <Route path="/chance" element={<DashboardRoute><ChanceCalculator /></DashboardRoute>} />
             <Route path="/progress" element={<DashboardRoute><Progress /></DashboardRoute>} />
             <Route path="/pricing" element={<DashboardRoute><Pricing /></DashboardRoute>} />
             <Route path="/settings" element={<DashboardRoute><Settings /></DashboardRoute>} />
