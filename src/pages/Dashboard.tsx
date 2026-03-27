@@ -7,21 +7,25 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BookOpen, Target, AlertTriangle, Flame, Lightbulb, Zap } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBullseye, faChartBar, faCalendarDays, faRulerCombined, faHeart, faCheck, faFire, faTriangleExclamation, faThumbtack, faBrain, faClock, faRotate, faBookOpen as faBookOpenFA, faStar, faBolt as faBoltFA, faLightbulb as faLightbulbFA } from '@fortawesome/free-solid-svg-icons';
 import { getLevelProgress } from '@/hooks/useXP';
 import { useXP } from '@/hooks/useXP';
 
 const STUDY_TIPS = [
-  "📌 প্রতিদিন অন্তত ৩০ মিনিট MCQ অনুশীলন করো — ধারাবাহিকতাই সাফল্যের চাবিকাঠি।",
-  "🧠 একটি topic পড়ার পর সাথে সাথে MCQ দাও — এতে মনে থাকবে বেশি।",
-  "📝 ভুল উত্তরগুলো নোট করো এবং পরদিন আবার চেষ্টা করো।",
-  "⏰ পরীক্ষার আগে নতুন কিছু না পড়ে, আগেরগুলো revision দাও।",
-  "🎯 দুর্বল বিষয়ে বেশি সময় দাও — সেখানেই marks বাড়বে।",
-  "💡 সৃজনশীল প্রশ্নে উদ্দীপকের সাথে পাঠ্যপুস্তকের তত্ত্ব মেলাও।",
-  "📖 প্রতিটি অধ্যায়ের শুরুতে summary পড়ে নাও — পুরো ছবি বুঝতে পারবে।",
-  "🔄 Spaced Repetition: আজ পড়লে ৩ দিন পর আবার পড়ো, তারপর ৭ দিন পর।",
-  "✍️ নিজে নোট তৈরি করো — পড়ার চেয়ে লেখায় মনে বেশি থাকে।",
-  "🏆 ছোট ছোট লক্ষ্য সেট করো: আজ ১০টি MCQ, কাল ১৫টি।",
+  { icon: faThumbtack, text: "প্রতিদিন অন্তত ৩০ মিনিট MCQ অনুশীলন করো — ধারাবাহিকতাই সাফল্যের চাবিকাঠি।" },
+  { icon: faBrain, text: "একটি topic পড়ার পর সাথে সাথে MCQ দাও — এতে মনে থাকবে বেশি।" },
+  { icon: faPenToSquare, text: "ভুল উত্তরগুলো নোট করো এবং পরদিন আবার চেষ্টা করো।" },
+  { icon: faClock, text: "পরীক্ষার আগে নতুন কিছু না পড়ে, আগেরগুলো revision দাও।" },
+  { icon: faBullseye, text: "দুর্বল বিষয়ে বেশি সময় দাও — সেখানেই marks বাড়বে।" },
+  { icon: faLightbulbFA, text: "সৃজনশীল প্রশ্নে উদ্দীপকের সাথে পাঠ্যপুস্তকের তত্ত্ব মেলাও।" },
+  { icon: faBookOpenFA, text: "প্রতিটি অধ্যায়ের শুরুতে summary পড়ে নাও — পুরো ছবি বুঝতে পারবে।" },
+  { icon: faRotate, text: "Spaced Repetition: আজ পড়লে ৩ দিন পর আবার পড়ো, তারপর ৭ দিন পর।" },
+  { icon: faPenToSquare, text: "নিজে নোট তৈরি করো — পড়ার চেয়ে লেখায় মনে বেশি থাকে।" },
+  { icon: faTrophy, text: "ছোট ছোট লক্ষ্য সেট করো: আজ ১০টি MCQ, কাল ১৫টি।" },
 ];
+
+import { faPenToSquare, faTrophy } from '@fortawesome/free-solid-svg-icons';
 
 const DashboardPage: React.FC = () => {
   const { profile } = useAuth();
@@ -39,7 +43,7 @@ const DashboardPage: React.FC = () => {
 
   const xp = (profile as any)?.xp_points || 0;
   const streak = (profile as any)?.study_streak || 0;
-  const level = (profile as any)?.user_level || 'নবীন 📖';
+  const level = (profile as any)?.user_level || 'নবীন';
   const { progress, xpNeeded, next } = getLevelProgress(xp);
   const today = new Date().toISOString().split('T')[0];
   const lastActivity = (profile as any)?.last_activity_date;
@@ -49,13 +53,8 @@ const DashboardPage: React.FC = () => {
     if (!profile) return;
     loadData();
     loadParentMessage();
-    // Daily login XP
-    if (!hasStudiedToday) {
-      addXP(5);
-    }
+    if (!hasStudiedToday) addXP(5);
     checkAndAwardBadges();
-
-    // Load recently viewed from localStorage
     const rv = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
     setRecentlyViewed(rv.slice(0, 5));
   }, [profile]);
@@ -72,7 +71,6 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  // Track page visit
   useEffect(() => {
     const existing = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
     const entry = { title: 'ড্যাশবোর্ড', path: '/dashboard' };
@@ -106,22 +104,20 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">স্বাগতম, {profile?.name || 'শিক্ষার্থী'} 👋</h2>
+      <h2 className="text-2xl font-bold">স্বাগতম, {profile?.name || 'শিক্ষার্থী'} <FontAwesomeIcon icon={faStar} className="text-secondary" /></h2>
 
-      {/* Parent message notification */}
       {parentMessage && (
         <Card className="border-blue-400/50 bg-blue-50 dark:bg-blue-950/30">
           <CardContent className="p-4 flex items-start justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1">💙 বাবা/মা বলেছেন:</p>
+              <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-1"><FontAwesomeIcon icon={faHeart} className="mr-1" /> বাবা/মা বলেছেন:</p>
               <p className="text-sm">{parentMessage.message}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={dismissParentMessage} className="shrink-0 text-xs">পড়েছি ✓</Button>
+            <Button variant="ghost" size="sm" onClick={dismissParentMessage} className="shrink-0 text-xs"><FontAwesomeIcon icon={faCheck} className="mr-1" /> পড়েছি</Button>
           </CardContent>
         </Card>
       )}
 
-      {/* XP + Level + Streak bar */}
       <Card className="card-hover overflow-hidden">
         <CardContent className="p-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -134,10 +130,10 @@ const DashboardPage: React.FC = () => {
             </div>
             {streak > 0 ? (
               <div className="text-center">
-                <p className="text-2xl font-bold text-orange-500">🔥 {streak} দিনের Streak!</p>
+                <p className="text-2xl font-bold text-orange-500"><FontAwesomeIcon icon={faFire} className="mr-2" />{streak} দিনের Streak!</p>
               </div>
             ) : !hasStudiedToday ? (
-              <p className="text-sm text-destructive animate-pulse font-semibold">⚠️ আজ পড়োনি! Streak হারাবে</p>
+              <p className="text-sm text-destructive animate-pulse font-semibold"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-1" /> আজ পড়োনি! Streak হারাবে</p>
             ) : null}
           </div>
           {next && (
@@ -152,7 +148,6 @@ const DashboardPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Tip of the Day */}
       <Card className="card-hover border-secondary/30 bg-secondary/5">
         <CardContent className="p-4 flex items-start gap-3">
           <div className="p-2 rounded-lg bg-secondary/10 shrink-0">
@@ -160,15 +155,14 @@ const DashboardPage: React.FC = () => {
           </div>
           <div>
             <p className="text-xs font-semibold text-secondary mb-1">আজকের পরামর্শ</p>
-            <p className="text-sm">{todayTip}</p>
+            <p className="text-sm"><FontAwesomeIcon icon={todayTip.icon} className="mr-2 text-primary" />{todayTip.text}</p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Recently Viewed */}
       {recentlyViewed.length > 1 && (
         <div>
-          <p className="font-semibold text-sm mb-2">📍 যেখানে ছিলে সেখান থেকে শুরু করো</p>
+          <p className="font-semibold text-sm mb-2"><FontAwesomeIcon icon={faThumbtack} className="mr-1 text-primary" /> যেখানে ছিলে সেখান থেকে শুরু করো</p>
           <div className="flex gap-3 overflow-x-auto pb-2">
             {recentlyViewed.filter(r => r.path !== '/dashboard').map((r, i) => (
               <Link key={i} to={r.path} className="shrink-0">
@@ -183,7 +177,6 @@ const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="card-hover">
           <CardContent className="p-4 flex items-center gap-3">
@@ -227,21 +220,19 @@ const DashboardPage: React.FC = () => {
         </Card>
       </div>
 
-      {/* Quick actions */}
       <Card className="card-hover">
-        <CardHeader><CardTitle className="text-lg">🎯 এখনই শুরু করো</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon={faBullseye} className="mr-2 text-primary" /> এখনই শুরু করো</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Link to="/mcq"><Button className="btn-ripple">MCQ অনুশীলন</Button></Link>
           <Link to="/explain"><Button variant="outline" className="btn-ripple">বুঝিয়ে দাও</Button></Link>
           <Link to="/srijonshil"><Button variant="outline" className="btn-ripple">সৃজনশীল Builder</Button></Link>
-          <Link to="/formula-sheet"><Button variant="outline" className="btn-ripple">📐 সূত্র শীট</Button></Link>
-          <Link to="/planner"><Button variant="outline" className="btn-ripple">📅 পড়ার পরিকল্পনা</Button></Link>
+          <Link to="/formula-sheet"><Button variant="outline" className="btn-ripple"><FontAwesomeIcon icon={faRulerCombined} className="mr-1" /> সূত্র শীট</Button></Link>
+          <Link to="/planner"><Button variant="outline" className="btn-ripple"><FontAwesomeIcon icon={faCalendarDays} className="mr-1" /> পড়ার পরিকল্পনা</Button></Link>
         </CardContent>
       </Card>
 
-      {/* Weekly chart */}
       <Card className="card-hover">
-        <CardHeader><CardTitle className="text-lg">📊 সাপ্তাহিক অগ্রগতি</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon={faChartBar} className="mr-2 text-primary" /> সাপ্তাহিক অগ্রগতি</CardTitle></CardHeader>
         <CardContent>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -257,7 +248,6 @@ const DashboardPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Recent activity */}
       {recentSessions.length > 0 && (
         <Card className="card-hover">
           <CardHeader><CardTitle className="text-lg">সাম্প্রতিক কার্যকলাপ</CardTitle></CardHeader>
@@ -282,10 +272,9 @@ const DashboardPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Weak topics */}
       {weakTopics.length > 0 && (
         <Card className="card-hover">
-          <CardHeader><CardTitle className="text-lg text-destructive">⚠️ দুর্বল বিষয়</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg text-destructive"><FontAwesomeIcon icon={faTriangleExclamation} className="mr-2" /> দুর্বল বিষয়</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             {weakTopics.map((w) => (
               <div key={w.id} className="flex items-center justify-between p-3 bg-destructive/5 rounded-lg border border-destructive/20">

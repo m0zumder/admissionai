@@ -5,6 +5,9 @@ import { Check, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStar, faCreditCard, faCheck as faCheckFA, faXmark, faCircleCheck, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faWhatsapp } from "@fortawesome/free-brands-svg-icons";
 
 const plans = [
   {
@@ -83,12 +86,12 @@ const plans = [
 ];
 
 const comparisonData = [
-  { feature: "App লাগে?", us: "❌ না", comp1: "✅ হ্যাঁ", comp2: "✅ হ্যাঁ" },
-  { feature: "Free তে AI?", us: "✅ হ্যাঁ", comp1: "❌ না", comp2: "❌ না" },
-  { feature: "বই Upload?", us: "✅ হ্যাঁ", comp1: "❌ না", comp2: "❌ না" },
-  { feature: "সৃজনশীল AI?", us: "✅ হ্যাঁ", comp1: "❌ না", comp2: "❌ না" },
-  { feature: "ছবি Solve?", us: "✅ হ্যাঁ", comp1: "❌ না", comp2: "❌ না" },
-  { feature: "মাসিক মূল্য", us: "৳১৯৯", comp1: "৳৮০০+", comp2: "৳৫০০+" },
+  { feature: "App লাগে?", us: false, usText: "না", comp1: true, comp1Text: "হ্যাঁ", comp2: true, comp2Text: "হ্যাঁ" },
+  { feature: "Free তে AI?", us: true, usText: "হ্যাঁ", comp1: false, comp1Text: "না", comp2: false, comp2Text: "না" },
+  { feature: "বই Upload?", us: true, usText: "হ্যাঁ", comp1: false, comp1Text: "না", comp2: false, comp2Text: "না" },
+  { feature: "সৃজনশীল AI?", us: true, usText: "হ্যাঁ", comp1: false, comp1Text: "না", comp2: false, comp2Text: "না" },
+  { feature: "ছবি Solve?", us: true, usText: "হ্যাঁ", comp1: false, comp1Text: "না", comp2: false, comp2Text: "না" },
+  { feature: "মাসিক মূল্য", us: true, usText: "৳১৯৯", comp1: false, comp1Text: "৳৮০০+", comp2: false, comp2Text: "৳৫০০+" },
 ];
 
 const PricingPage: React.FC = () => {
@@ -124,7 +127,9 @@ const PricingPage: React.FC = () => {
           return (
             <Card key={plan.name} className={`relative ${plan.popular ? "border-2 border-secondary shadow-xl md:scale-105" : "border-border"}`}>
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">⭐ সবচেয়ে জনপ্রিয়</div>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-secondary-foreground text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  <FontAwesomeIcon icon={faStar} className="mr-1" /> সবচেয়ে জনপ্রিয়
+                </div>
               )}
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-sm text-muted-foreground">{plan.name}</CardTitle>
@@ -137,14 +142,18 @@ const PricingPage: React.FC = () => {
                 <ul className="space-y-1.5">
                   {plan.features.map((f) => (
                     <li key={f.text} className="flex items-start gap-2 text-sm">
-                      {f.included ? <Check className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" /> : <X className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />}
+                      {f.included ? (
+                        <FontAwesomeIcon icon={faCheckFA} className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <FontAwesomeIcon icon={faXmark} className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      )}
                       <span className={f.included ? "" : "text-muted-foreground"}>{f.text}</span>
                     </li>
                   ))}
                 </ul>
                 <Button className="w-full" variant={plan.popular ? "default" : "outline"} disabled={isCurrentPlan || isLoading || plan.plan_id === "free"} onClick={() => handlePayment(plan.plan_id)}>
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                  {isCurrentPlan ? "✓ বর্তমান প্ল্যান" : plan.cta}
+                  {isCurrentPlan ? <><FontAwesomeIcon icon={faCheckFA} className="mr-1" /> বর্তমান প্ল্যান</> : plan.cta}
                 </Button>
               </CardContent>
             </Card>
@@ -170,9 +179,15 @@ const PricingPage: React.FC = () => {
                 {comparisonData.map((row) => (
                   <tr key={row.feature} className="border-b border-border last:border-0">
                     <td className="p-3 font-medium">{row.feature}</td>
-                    <td className="p-3 text-center font-semibold text-primary">{row.us}</td>
-                    <td className="p-3 text-center text-muted-foreground">{row.comp1}</td>
-                    <td className="p-3 text-center text-muted-foreground">{row.comp2}</td>
+                    <td className="p-3 text-center font-semibold text-primary">
+                      <FontAwesomeIcon icon={row.us ? faCircleCheck : faCircleXmark} className={`mr-1 ${row.us ? 'text-green-600' : 'text-red-500'}`} /> {row.usText}
+                    </td>
+                    <td className="p-3 text-center text-muted-foreground">
+                      <FontAwesomeIcon icon={row.comp1 ? faCircleCheck : faCircleXmark} className={`mr-1 ${row.comp1 ? 'text-green-600' : 'text-red-500'}`} /> {row.comp1Text}
+                    </td>
+                    <td className="p-3 text-center text-muted-foreground">
+                      <FontAwesomeIcon icon={row.comp2 ? faCircleCheck : faCircleXmark} className={`mr-1 ${row.comp2 ? 'text-green-600' : 'text-red-500'}`} /> {row.comp2Text}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -184,10 +199,10 @@ const PricingPage: React.FC = () => {
       <div className="text-center">
         <Card className="inline-block">
           <CardContent className="p-6">
-            <p className="font-semibold mb-2">💳 পেমেন্ট পদ্ধতি</p>
+            <p className="font-semibold mb-2"><FontAwesomeIcon icon={faCreditCard} className="mr-2 text-primary" /> পেমেন্ট পদ্ধতি</p>
             <p className="text-sm text-muted-foreground mb-4">bKash / Nagad / Card দিয়ে পেমেন্ট করুন</p>
             <a href="https://wa.me/8801609059992" target="_blank" rel="noopener noreferrer">
-              <Button variant="outline">WhatsApp এ যোগাযোগ করুন</Button>
+              <Button variant="outline"><FontAwesomeIcon icon={faWhatsapp} className="mr-2" /> WhatsApp এ যোগাযোগ করুন</Button>
             </a>
           </CardContent>
         </Card>
