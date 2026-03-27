@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookmarks: {
+        Row: {
+          content_id: string | null
+          content_preview: string
+          content_type: string
+          created_at: string
+          id: string
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          content_id?: string | null
+          content_preview: string
+          content_type: string
+          created_at?: string
+          id?: string
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          content_id?: string | null
+          content_preview?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          subject?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      challenges: {
+        Row: {
+          code: string
+          created_at: string
+          creator_id: string
+          creator_score: number | null
+          id: string
+          opponent_id: string | null
+          opponent_score: number | null
+          questions: Json
+          status: string
+          subject_name: string
+          topic_name: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          creator_id: string
+          creator_score?: number | null
+          id?: string
+          opponent_id?: string | null
+          opponent_score?: number | null
+          questions?: Json
+          status?: string
+          subject_name: string
+          topic_name?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          creator_id?: string
+          creator_score?: number | null
+          id?: string
+          opponent_id?: string | null
+          opponent_score?: number | null
+          questions?: Json
+          status?: string
+          subject_name?: string
+          topic_name?: string | null
+        }
+        Relationships: []
+      }
       creative_answers: {
         Row: {
           created_at: string
@@ -37,6 +109,33 @@ export type Database = {
           id?: string
           subject?: string
           uddipok?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      error_reports: {
+        Row: {
+          created_at: string
+          id: string
+          issue_type: string
+          question_text: string
+          subject: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          issue_type: string
+          question_text: string
+          subject?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          issue_type?: string
+          question_text?: string
+          subject?: string | null
           user_id?: string
         }
         Relationships: []
@@ -177,11 +276,19 @@ export type Database = {
           daily_photo_count: number
           daily_srijonshil_count: number
           exam_date: string | null
+          font_size: string
           id: string
+          last_activity_date: string | null
           last_reset_date: string
           name: string | null
+          streak_freeze_used_this_week: boolean
+          study_streak: number
           subscription_plan: string
           target_exam: string | null
+          user_level: string
+          weekly_xp: number
+          weekly_xp_reset_date: string | null
+          xp_points: number
         }
         Insert: {
           avatar_emoji?: string | null
@@ -192,11 +299,19 @@ export type Database = {
           daily_photo_count?: number
           daily_srijonshil_count?: number
           exam_date?: string | null
+          font_size?: string
           id: string
+          last_activity_date?: string | null
           last_reset_date?: string
           name?: string | null
+          streak_freeze_used_this_week?: boolean
+          study_streak?: number
           subscription_plan?: string
           target_exam?: string | null
+          user_level?: string
+          weekly_xp?: number
+          weekly_xp_reset_date?: string | null
+          xp_points?: number
         }
         Update: {
           avatar_emoji?: string | null
@@ -207,11 +322,19 @@ export type Database = {
           daily_photo_count?: number
           daily_srijonshil_count?: number
           exam_date?: string | null
+          font_size?: string
           id?: string
+          last_activity_date?: string | null
           last_reset_date?: string
           name?: string | null
+          streak_freeze_used_this_week?: boolean
+          study_streak?: number
           subscription_plan?: string
           target_exam?: string | null
+          user_level?: string
+          weekly_xp?: number
+          weekly_xp_reset_date?: string | null
+          xp_points?: number
         }
         Relationships: []
       }
@@ -276,6 +399,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_badges: {
+        Row: {
+          badge_description: string
+          badge_emoji: string
+          badge_name: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_description?: string
+          badge_emoji?: string
+          badge_name: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_description?: string
+          badge_emoji?: string
+          badge_name?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       weak_topics: {
         Row: {
