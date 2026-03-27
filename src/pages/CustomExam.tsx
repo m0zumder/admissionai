@@ -538,7 +538,7 @@ const CustomExamPage: React.FC = () => {
 
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => setStep('params')}>← আগে</Button>
-          <Button className="flex-1 bg-green-600 hover:bg-green-700 text-white" size="lg" onClick={startExam} disabled={loading}>
+          <Button className="flex-1 bg-primary hover:bg-primary/90" size="lg" onClick={startExam} disabled={loading}>
             {loading ? <ThinkingDots /> : 'পরীক্ষা শুরু করো 🚀'}
           </Button>
         </div>

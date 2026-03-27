@@ -167,7 +167,7 @@ const ChanceCalculatorPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="lg" onClick={calculateChance} disabled={loading}>
+          <Button className="w-full" size="lg" onClick={calculateChance} disabled={loading}>
             {loading ? <ThinkingDots /> : 'সম্ভাবনা দেখো 🎯'}
           </Button>
         </>
