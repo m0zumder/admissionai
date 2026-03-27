@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBrain, faLightbulb, faPenFancy, faCamera, faChartBar, faFileAlt,
   faGlobe, faGift, faMoon, faMoneyBill, faLock, faImage,
-  faStar, faFlag, faRocket, faClock
+  faStar, faFlag, faRocket, faClock, faTrophy, faComments, faCreditCard, faEye
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "@/assets/logo.png";
 

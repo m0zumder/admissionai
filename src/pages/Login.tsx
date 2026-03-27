@@ -18,7 +18,7 @@ import {
   faGraduationCap, faBullseye, faBook, faCalendarDays, faBookOpen,
   faUserGraduate, faPaw, faBolt, faFire, faStar, faDumbbell, faTrophy,
   faPenToSquare, faHospital, faGear, faLandmark, faMicroscope, faScroll,
-  faBriefcase, faArrowRight, faArrowLeft, faRocket, faUsers
+  faBriefcase, faArrowRight, faArrowLeft, faRocket, faUsers, faLink, faLock
 } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import logo from "@/assets/logo.png";
