@@ -26,9 +26,23 @@ const testimonials = [
   { name: 'ফাহিম', class: 'BUET Aspirant', text: 'Topic explainer ফিচারটা গেম চেঞ্জার। কঠিন টপিক সহজ বাংলায় বুঝিয়ে দেয়।' },
 ];
 
+const competitorComparisons = [
+  { icon: '🌐', title: 'Web-based — কোনো App লাগবে না', desc: 'Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল — সব সাপোর্ট। App crash এর চিন্তা নেই।' },
+  { icon: '🆓', title: 'Free তেই AI ফিচার', desc: 'MCQ, Topic Explain, সৃজনশীল, ছবি থেকে সমাধান — সব AI ফিচার Free plan এ পাওয়া যায়। কোনো Sales Call আসবে না।' },
+  { icon: '🌙', title: 'Anytime, Anywhere — AI সবসময় Available', desc: 'রাত ৩টায়ও প্রশ্ন করো, সাথে সাথে উত্তর পাবে। কোনো ক্লাস cancel হবে না। 24/7/365 AI শিক্ষক তোমার পাশে।' },
+  { icon: '🔒', title: 'Google Login — ঝামেলা নেই', desc: 'শুধু Google দিয়ে লগ ইন করো। কোনো ফোন নম্বর দেওয়া লাগবে না, কোনো OTP ঝামেলা নেই।' },
+  { icon: '📸', title: 'ছবি তুলে সমাধান পাও', desc: 'প্রশ্নের ছবি তোলো — AI ধাপে ধাপে বাংলায় সমাধান দেবে। গণিত, পদার্থবিজ্ঞান, রসায়ন সব কাজ করে।' },
+  { icon: '💸', title: 'মাত্র ৳199/মাস', desc: 'Shikho ৳800-2000, 10MS ৳500+। আমাদের Student Plan মাত্র ৳199/মাস। সেরা ফিচার, সেরা দাম।' },
+];
+
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
+      {/* Slim yellow web-first banner */}
+      <div className="bg-amber-400 text-amber-950 text-center py-2 px-4 text-sm font-medium">
+        ✅ কোনো App ইনস্টল লাগবে না — Browser এই চলে | 🌙 AI সবসময় Available 24/7 | 💸 মাত্র ৳199/মাস
+      </div>
+
       {/* Navbar */}
       <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -38,6 +52,7 @@ const LandingPage: React.FC = () => {
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">ফিচারস</a>
+            <a href="#why-us" className="text-muted-foreground hover:text-foreground transition-colors">কেন আমরা?</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">প্রাইসিং</a>
             <Link to="/login">
               <Button variant="outline" size="sm">লগ ইন</Button>
@@ -52,7 +67,6 @@ const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-
       {/* Hero */}
       <section className="container mx-auto px-4 py-16 md:py-24 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center">
@@ -61,8 +75,11 @@ const LandingPage: React.FC = () => {
             <span className="text-primary hero-glow">এখন সহজ</span>
           </h1>
           <p className="text-sm font-medium tracking-widest uppercase text-primary/70 mb-3 animate-fade-in-delay-1">Smart Learning, Simplified Prep</p>
-          <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto animate-fade-in-delay-2">
+          <p className="text-lg md:text-xl text-muted-foreground mb-2 max-w-2xl mx-auto animate-fade-in-delay-2">
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
+          </p>
+          <p className="text-sm text-primary/80 font-semibold mb-6 animate-fade-in-delay-2">
+            🕐 Anytime, Anywhere — দিনে রাতে যখন খুশি পড়ো, AI সবসময় তোমার পাশে
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-3">
             <Link to="/login">
@@ -132,16 +149,14 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Why Us - Competitor pain points */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Smart Learning, Simplified Prep</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {[
-            { icon: '🌐', title: 'Web-based — কোনো App লাগবে না', desc: 'Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল সব সাপোর্ট করে।' },
-            { icon: '🆓', title: 'Free তেই AI ফিচার', desc: 'MCQ, Topic Explain, সৃজনশীল — সব AI ফিচার Free plan এ পাওয়া যায় (দৈনিক সীমিত)।' },
-            { icon: '🌙', title: 'সারারাত পড়তে পারো', desc: 'AI শিক্ষক 24/7 Available। রাত ৩টায়ও প্রশ্ন করো, সাথে সাথে উত্তর পাবে।' },
-            { icon: '🔒', title: 'Google Login — ঝামেলা নেই', desc: 'শুধু Google দিয়ে লগ ইন করো। কোনো ফোন নম্বর দেওয়া লাগবে না।' },
-          ].map((item) => (
-            <Card key={item.title} className="border-border/50">
+      <section id="why-us" className="container mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-4">কেন Admission AI সেরা?</h2>
+        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
+          Shikho, 10 Minute School, HulkenStein — সবার সীমাবদ্ধতা আমরা সমাধান করেছি
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {competitorComparisons.map((item, index) => (
+            <Card key={item.title} className="border-border/50 card-hover animate-feature-pop" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-6">
                 <div className="text-3xl mb-3">{item.icon}</div>
                 <h3 className="font-bold mb-2">{item.title}</h3>
