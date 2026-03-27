@@ -52,10 +52,6 @@ const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* Web-first Banner */}
-      <div className="bg-primary text-primary-foreground text-center py-2.5 text-sm font-medium">
-        ✅ কোনো App ইনস্টল লাগবে না — Browser এই চলে ✓ | 🌙 সারারাত পড়তে পারো — AI সবসময় Available
-      </div>
 
       {/* Hero */}
       <section className="container mx-auto px-4 py-16 md:py-24">
