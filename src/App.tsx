@@ -84,6 +84,7 @@ const App = () => (
             <Route path="/badges" element={<DashboardRoute><Badges /></DashboardRoute>} />
             <Route path="/bookmarks" element={<DashboardRoute><Bookmarks /></DashboardRoute>} />
             <Route path="/planner" element={<DashboardRoute><Planner /></DashboardRoute>} />
+            <Route path="/parent-dashboard" element={<DashboardRoute><ParentDashboard /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
