@@ -218,6 +218,63 @@ export type Database = {
         }
         Relationships: []
       }
+      parent_links: {
+        Row: {
+          child_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          linking_code: string
+          parent_id: string | null
+          status: string
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linking_code: string
+          parent_id?: string | null
+          status?: string
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          linking_code?: string
+          parent_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      parent_messages: {
+        Row: {
+          child_id: string
+          created_at: string
+          id: string
+          message: string
+          parent_id: string
+          read: boolean
+        }
+        Insert: {
+          child_id: string
+          created_at?: string
+          id?: string
+          message: string
+          parent_id: string
+          read?: boolean
+        }
+        Update: {
+          child_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          parent_id?: string
+          read?: boolean
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -278,6 +335,7 @@ export type Database = {
           exam_date: string | null
           font_size: string
           id: string
+          is_parent: boolean
           last_activity_date: string | null
           last_reset_date: string
           name: string | null
@@ -301,6 +359,7 @@ export type Database = {
           exam_date?: string | null
           font_size?: string
           id: string
+          is_parent?: boolean
           last_activity_date?: string | null
           last_reset_date?: string
           name?: string | null
@@ -324,6 +383,7 @@ export type Database = {
           exam_date?: string | null
           font_size?: string
           id?: string
+          is_parent?: boolean
           last_activity_date?: string | null
           last_reset_date?: string
           name?: string | null
