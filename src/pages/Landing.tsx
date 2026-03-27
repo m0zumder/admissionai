@@ -54,24 +54,24 @@ const LandingPage: React.FC = () => {
 
 
       {/* Hero */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
+      <section className="container mx-auto px-4 py-16 md:py-24 overflow-hidden">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6 animate-fade-in">
             AI দিয়ে পড়াশোনা <br />
-            <span className="text-primary">এখন সহজ</span>
+            <span className="text-primary hero-glow">এখন সহজ</span>
           </h1>
-          <p className="text-sm font-medium tracking-widest uppercase text-primary/70 mb-3">Smart Learning, Simplified Prep</p>
-          <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
+          <p className="text-sm font-medium tracking-widest uppercase text-primary/70 mb-3 animate-fade-in-delay-1">Smart Learning, Simplified Prep</p>
+          <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto animate-fade-in-delay-2">
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-3">
             <Link to="/login">
-              <Button size="lg" className="text-lg px-8 py-6 w-full sm:w-auto">
+              <Button size="lg" className="text-lg px-8 py-6 w-full sm:w-auto btn-ripple hover:scale-105 transition-transform">
                 বিনামূল্যে শুরু করো
               </Button>
             </Link>
             <a href="#features">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 w-full sm:w-auto hover:scale-105 transition-transform">
                 কীভাবে কাজ করে?
               </Button>
             </a>
@@ -79,7 +79,7 @@ const LandingPage: React.FC = () => {
 
           {/* Floating preview cards */}
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-            <Card className="animate-float glass-card">
+            <Card className="animate-slide-left animate-float glass-card card-hover">
               <CardContent className="p-4">
                 <p className="text-sm font-semibold mb-2">📝 Sample MCQ</p>
                 <p className="text-sm text-muted-foreground">পানি কত ডিগ্রি সেলসিয়াসে ফুটে?</p>
@@ -89,7 +89,7 @@ const LandingPage: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card className="animate-float-delayed glass-card">
+            <Card className="animate-slide-right animate-float-delayed glass-card card-hover">
               <CardContent className="p-4">
                 <p className="text-sm font-semibold mb-2">📸 ছবি থেকে সমাধান</p>
                 <p className="text-sm text-muted-foreground">
@@ -105,10 +105,10 @@ const LandingPage: React.FC = () => {
       <section id="features" className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">আমাদের ফিচারস</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((f) => (
-            <Card key={f.title} className="text-center hover:shadow-xl transition-shadow border-border/50">
+          {features.map((f, index) => (
+            <Card key={f.title} className="text-center hover:shadow-xl transition-all border-border/50 card-hover animate-feature-pop" style={{ animationDelay: `${index * 0.1}s` }}>
               <CardContent className="p-6">
-                <div className="text-4xl mb-4">{f.icon}</div>
+                <div className="text-4xl mb-4 animate-bounce-in" style={{ animationDelay: `${index * 0.1 + 0.3}s` }}>{f.icon}</div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </CardContent>
