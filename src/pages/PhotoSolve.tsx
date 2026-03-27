@@ -28,8 +28,8 @@ const PhotoSolvePage: React.FC = () => {
   const currentCount = (profile as any)?.daily_photo_count || 0;
 
   const handleFile = (file: File) => {
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'ফাইল অনেক বড়', description: 'সর্বোচ্চ 5MB ফাইল আপলোড করো', variant: 'destructive' });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'ফাইল অনেক বড়', description: 'সর্বোচ্চ 10MB ফাইল আপলোড করো', variant: 'destructive' });
       return;
     }
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
@@ -117,7 +117,7 @@ const PhotoSolvePage: React.FC = () => {
           <CardContent className="p-8 text-center space-y-6">
             <div className="text-6xl">📷</div>
             <p className="text-lg font-semibold">প্রশ্নের ছবি তোলো বা Upload করো</p>
-            <p className="text-sm text-muted-foreground">JPG, PNG, WEBP (সর্বোচ্চ 5MB)</p>
+            <p className="text-sm text-muted-foreground">JPG, PNG, WEBP (সর্বোচ্চ 10MB)</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button onClick={() => cameraInputRef.current?.click()} className="gap-2">
                 <Camera className="h-4 w-4" /> Camera তোলো

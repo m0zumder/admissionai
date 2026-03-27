@@ -59,11 +59,18 @@ const MCQPage: React.FC = () => {
   const [highChanceOnly, setHighChanceOnly] = useState(false);
 
   const classLevel = profile?.class_level || 'SSC';
+  const targetExam = profile?.target_exam || '';
+  // Extract HSC stream from target_exam e.g. "HSC 2025 (science)"
+  const hscStream = targetExam.match(/\((science|humanities|commerce)\)/)?.[1] || '';
 
   useEffect(() => {
-    supabase.from('subjects').select('*').eq('class_level', classLevel)
-      .then(({ data }) => setSubjects(data || []));
-  }, [classLevel]);
+    let query = supabase.from('subjects').select('*').eq('class_level', classLevel);
+    // Filter HSC subjects by stream
+    if (classLevel === 'HSC' && hscStream) {
+      query = query.or(`stream.eq.${hscStream},stream.eq.compulsory`);
+    }
+    query.then(({ data }) => setSubjects(data || []));
+  }, [classLevel, hscStream]);
 
   useEffect(() => {
     if (selectedSubject) {
