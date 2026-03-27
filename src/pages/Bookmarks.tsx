@@ -5,8 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trash2, Eye, Search, Bookmark } from 'lucide-react';
+import { Trash2, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const BookmarksPage: React.FC = () => {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ const BookmarksPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">🔖 বুকমার্কস</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="bookmark" className="mr-2 text-primary" />বুকমার্কস</h2>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -58,9 +59,9 @@ const BookmarksPage: React.FC = () => {
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
-            <Bookmark className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <FontAwesomeIcon icon="bookmark" className="text-4xl mb-3 opacity-30" />
             <p className="font-medium">এখনো কিছু bookmark করোনি</p>
-            <p className="text-sm mt-1">পড়তে পড়তে 🔖 চাপো!</p>
+            <p className="text-sm mt-1"><FontAwesomeIcon icon="bookmark" className="mr-1" />চাপো!</p>
           </CardContent>
         </Card>
       ) : (

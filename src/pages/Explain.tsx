@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const ExplainPage: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
@@ -60,7 +60,7 @@ const ExplainPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0">
-      <h2 className="text-2xl font-bold">💡 বুঝিয়ে দাও</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="lightbulb" className="mr-2 text-primary" />বুঝিয়ে দাও</h2>
       <p className="text-muted-foreground">যেকোনো topic লেখো, AI সহজ বাংলায় বুঝিয়ে দেবে</p>
 
       <Textarea
@@ -91,7 +91,7 @@ const ExplainPage: React.FC = () => {
       </div>
 
       <Button className="w-full" size="lg" onClick={handleExplain} disabled={loading || !topic.trim()}>
-        {loading ? <ThinkingDots /> : 'বুঝিয়ে দাও 🧠'}
+        {loading ? <ThinkingDots /> : <><FontAwesomeIcon icon="brain" className="mr-2" />বুঝিয়ে দাও</>}
       </Button>
 
       {explanation && (

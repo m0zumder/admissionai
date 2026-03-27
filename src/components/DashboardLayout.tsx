@@ -21,7 +21,7 @@ import logo from '@/assets/logo.png';
 const navItems = [
   { title: 'ড্যাশবোর্ড', url: '/dashboard', icon: LayoutDashboard },
   { title: 'MCQ অনুশীলন', url: '/mcq', icon: BookOpen },
-  { title: '📸 ছবি থেকে সমাধান', url: '/photo-solve', icon: Camera },
+  { title: 'ছবি থেকে সমাধান', url: '/photo-solve', icon: Camera },
   { title: 'বুঝিয়ে দাও', url: '/explain', icon: Lightbulb },
   { title: 'সৃজনশীল', url: '/srijonshil', icon: PenTool },
   { title: 'নোটবুক', url: '/notebook', icon: FileText },

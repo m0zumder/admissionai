@@ -13,6 +13,7 @@ import { ErrorReportModal } from '@/components/ErrorReportModal';
 import { useXP } from '@/hooks/useXP';
 import { useToast } from '@/hooks/use-toast';
 import { Bookmark, Share2, Swords } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type MCQQuestion = {
   question: string;
@@ -20,11 +21,11 @@ type MCQQuestion = {
   explanation: string;
 };
 
-const IMPORTANCE_CONFIG: Record<string, { color: string; dot: string; label: string; desc: string }> = {
-  critical: { color: 'bg-destructive text-destructive-foreground', dot: '🔴', label: 'অতি গুরুত্বপূর্ণ', desc: 'বোর্ডে ৫+ বার এসেছে' },
-  high: { color: 'bg-secondary text-secondary-foreground', dot: '🟡', label: 'গুরুত্বপূর্ণ', desc: 'বোর্ডে ৩-৪ বার এসেছে' },
-  medium: { color: 'bg-primary/20 text-primary', dot: '🟢', label: 'মাঝারি', desc: 'বোর্ডে ১-২ বার এসেছে' },
-  low: { color: 'bg-muted text-muted-foreground', dot: '⚪', label: 'কম গুরুত্বপূর্ণ', desc: 'কম আসে' },
+const IMPORTANCE_CONFIG: Record<string, { color: string; dot: string; dotColor: string; label: string; desc: string }> = {
+  critical: { color: 'bg-destructive text-destructive-foreground', dot: 'circle', dotColor: 'text-destructive', label: 'অতি গুরুত্বপূর্ণ', desc: 'বোর্ডে ৫+ বার এসেছে' },
+  high: { color: 'bg-secondary text-secondary-foreground', dot: 'circle', dotColor: 'text-yellow-500', label: 'গুরুত্বপূর্ণ', desc: 'বোর্ডে ৩-৪ বার এসেছে' },
+  medium: { color: 'bg-primary/20 text-primary', dot: 'circle', dotColor: 'text-green-500', label: 'মাঝারি', desc: 'বোর্ডে ১-২ বার এসেছে' },
+  low: { color: 'bg-muted text-muted-foreground', dot: 'circle', dotColor: 'text-muted-foreground', label: 'কম গুরুত্বপূর্ণ', desc: 'কম আসে' },
 };
 
 const ImportanceBadge: React.FC<{ importance: string }> = ({ importance }) => {
@@ -33,7 +34,7 @@ const ImportanceBadge: React.FC<{ importance: string }> = ({ importance }) => {
     <Tooltip>
       <TooltipTrigger asChild>
         <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full ${cfg.color}`}>
-          {cfg.dot} {cfg.label}
+          <FontAwesomeIcon icon={cfg.dot as any} className={`mr-1 text-xs ${cfg.dotColor}`} /> {cfg.label}
         </span>
       </TooltipTrigger>
       <TooltipContent>
@@ -281,7 +282,7 @@ const MCQPage: React.FC = () => {
         {showExplanation && (
           <Card className="border-primary/30 animate-fade-in">
             <CardContent className="p-4">
-              <p className="text-sm font-semibold mb-1">📖 ব্যাখ্যা:</p>
+              <p className="text-sm font-semibold mb-1"><FontAwesomeIcon icon="book-open" className="mr-1 text-primary" /> ব্যাখ্যা:</p>
               <p className="text-sm text-muted-foreground">{q.explanation}</p>
               {isWrong && (
                 <Button variant="outline" size="sm" className="mt-3 btn-ripple" onClick={handleDeepExplain}>
@@ -308,7 +309,7 @@ const MCQPage: React.FC = () => {
       <div className="max-w-md mx-auto text-center space-y-6 pb-20 md:pb-0 animate-fade-in">
         <Card className="card-hover">
           <CardContent className="p-8">
-            <div className="text-6xl mb-4">{pct >= 70 ? '🎉' : pct >= 40 ? '👍' : '💪'}</div>
+            <div className="text-6xl mb-4 text-primary">{pct >= 70 ? <FontAwesomeIcon icon="champagne-glasses" /> : pct >= 40 ? <FontAwesomeIcon icon="thumbs-up" /> : <FontAwesomeIcon icon="dumbbell" />}</div>
             <h2 className="text-2xl font-bold mb-2">তোমার স্কোর</h2>
             <p className="text-4xl font-bold text-primary">{score}/{questions.length}</p>
             <p className="text-lg text-muted-foreground">({pct}%)</p>
@@ -331,7 +332,7 @@ const MCQPage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📝 MCQ অনুশীলন</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="pen-to-square" className="mr-2 text-primary" />MCQ অনুশীলন</h2>
       <p className="text-muted-foreground">বিষয় ও অধ্যায় বেছে নিয়ে MCQ প্র্যাক্টিস শুরু করো</p>
 
       {/* Subject selection */}
@@ -392,7 +393,7 @@ const MCQPage: React.FC = () => {
       {selectedSubject && (
         <>
           <Button className="w-full btn-ripple" size="lg" onClick={startQuiz} disabled={loading}>
-            {loading ? <ThinkingDots /> : 'শুরু করো 🚀'}
+            {loading ? <ThinkingDots /> : <><FontAwesomeIcon icon="rocket" className="mr-2" />শুরু করো</>}
           </Button>
           <Button variant="outline" className="w-full" size="lg" onClick={handleChallenge} disabled={challengeLoading}>
             {challengeLoading ? <ThinkingDots /> : <><Swords className="h-5 w-5 mr-2" /> ⚔️ বন্ধুকে চ্যালেঞ্জ করো</>}

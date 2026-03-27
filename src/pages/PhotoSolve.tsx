@@ -8,6 +8,7 @@ import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
 import { useToast } from '@/hooks/use-toast';
 import { Camera, Upload, RotateCcw, BookOpen } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const PhotoSolvePage: React.FC = () => {
   const { profile, refreshProfile } = useAuth();
@@ -69,7 +70,6 @@ const PhotoSolvePage: React.FC = () => {
       const text = data?.solution || 'সমাধান পাওয়া যায়নি।';
       setSolution(text);
 
-      // Typing animation
       let i = 0;
       const interval = setInterval(() => {
         i += 3;
@@ -81,7 +81,6 @@ const PhotoSolvePage: React.FC = () => {
         }
       }, 15);
 
-      // Update daily count
       const today = new Date().toISOString().split('T')[0];
       const resetNeeded = profile.last_reset_date < today;
       await supabase.from('profiles').update({
@@ -104,7 +103,7 @@ const PhotoSolvePage: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">📸 ছবি থেকে সমাধান</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="camera" className="mr-2 text-primary" />ছবি থেকে সমাধান</h2>
       <p className="text-muted-foreground">
         প্রশ্নের ছবি তুলো বা আপলোড করো — AI সমাধান দিয়ে দেবে
       </p>
@@ -115,7 +114,7 @@ const PhotoSolvePage: React.FC = () => {
       {!imagePreview ? (
         <Card className="border-2 border-dashed border-primary/30 hover:border-primary/60 transition-colors">
           <CardContent className="p-8 text-center space-y-6">
-            <div className="text-6xl">📷</div>
+            <div className="text-6xl text-primary/60"><FontAwesomeIcon icon="camera" /></div>
             <p className="text-lg font-semibold">প্রশ্নের ছবি তোলো বা Upload করো</p>
             <p className="text-sm text-muted-foreground">JPG, PNG, WEBP (সর্বোচ্চ 10MB)</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -126,21 +125,8 @@ const PhotoSolvePage: React.FC = () => {
                 <Upload className="h-4 w-4" /> File Upload
               </Button>
             </div>
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-            />
+            <input ref={cameraInputRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
           </CardContent>
         </Card>
       ) : (
@@ -154,7 +140,7 @@ const PhotoSolvePage: React.FC = () => {
           {!solution && !loading && (
             <div className="flex gap-3">
               <Button className="flex-1" size="lg" onClick={handleSolve}>
-                🧠 সমাধান করো
+                <FontAwesomeIcon icon="brain" className="mr-2" />সমাধান করো
               </Button>
               <Button variant="outline" onClick={reset}>
                 <RotateCcw className="h-4 w-4" />
@@ -176,7 +162,7 @@ const PhotoSolvePage: React.FC = () => {
           {displayedText && (
             <Card className="border-primary/30">
               <CardContent className="p-6">
-                <p className="text-sm font-semibold mb-3">📖 সমাধান:</p>
+                <p className="text-sm font-semibold mb-3"><FontAwesomeIcon icon="book-open" className="mr-2 text-primary" />সমাধান:</p>
                 <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
                   {displayedText}
                 </div>

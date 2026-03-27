@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Trophy, Medal, Award } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface LeaderboardEntry {
   user_id: string;
@@ -23,7 +23,6 @@ const Leaderboard: React.FC = () => {
 
   const loadLeaderboard = async () => {
     setLoading(true);
-    // Fetch all sessions (public read policy needed)
     const { data: sessions } = await supabase
       .from('mcq_sessions')
       .select('user_id, score_percentage, questions_attempted');
@@ -33,7 +32,6 @@ const Leaderboard: React.FC = () => {
       return;
     }
 
-    // Aggregate by user
     const userMap: Record<string, { scores: number[]; total: number }> = {};
     sessions.forEach((s) => {
       if (!userMap[s.user_id]) userMap[s.user_id] = { scores: [], total: 0 };
@@ -41,7 +39,6 @@ const Leaderboard: React.FC = () => {
       userMap[s.user_id].total += 1;
     });
 
-    // Get profile names for those users
     const userIds = Object.keys(userMap);
     const { data: profiles } = await supabase
       .from('profiles')
@@ -67,15 +64,15 @@ const Leaderboard: React.FC = () => {
   };
 
   const getRankIcon = (index: number) => {
-    if (index === 0) return <Trophy className="h-6 w-6 text-yellow-500" />;
-    if (index === 1) return <Medal className="h-6 w-6 text-gray-400" />;
-    if (index === 2) return <Award className="h-6 w-6 text-amber-600" />;
+    if (index === 0) return <FontAwesomeIcon icon="trophy" className="h-6 w-6 text-yellow-500" />;
+    if (index === 1) return <FontAwesomeIcon icon="medal" className="h-6 w-6 text-gray-400" />;
+    if (index === 2) return <FontAwesomeIcon icon="star" className="h-6 w-6 text-amber-600" />;
     return <span className="w-6 h-6 flex items-center justify-center text-sm font-bold text-muted-foreground">{index + 1}</span>;
   };
 
   return (
     <div className="space-y-6 pb-20 md:pb-0">
-      <h2 className="text-2xl font-bold">🏆 লিডারবোর্ড</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon="trophy" className="mr-2 text-secondary" />লিডারবোর্ড</h2>
       <p className="text-sm text-muted-foreground">সেরা পরীক্ষার্থীদের তালিকা — গড় স্কোর অনুযায়ী</p>
 
       <Card>
