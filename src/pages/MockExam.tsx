@@ -357,15 +357,49 @@ const MockExamPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Negative marking analysis */}
+        {/* Negative marking analysis + Guessing Risk Analyzer */}
         {preset?.negativeMarking && negativeMarkingOn ? (
-          <Card className="border-destructive/30 bg-destructive/5">
-            <CardContent className="p-6 text-center space-y-2">
-              <p className="font-semibold">📊 নেগেটিভ মার্কিং বিশ্লেষণ</p>
-              <p className="text-sm">তুমি <span className="text-destructive font-bold">{wrong}টি</span> ভুল করেছো → <span className="text-destructive font-bold">-{deduction.toFixed(2)}</span> marks হারিয়েছো</p>
-              <p className="text-sm">{unanswered}টি blank রেখেছো → <span className="text-primary font-semibold">ভালো সিদ্ধান্ত ছিলো</span></p>
-            </CardContent>
-          </Card>
+          <>
+            <Card className="border-destructive/30 bg-destructive/5">
+              <CardContent className="p-6 text-center space-y-2">
+                <p className="font-semibold">📊 নেগেটিভ মার্কিং বিশ্লেষণ</p>
+                <p className="text-sm">তুমি <span className="text-destructive font-bold">{wrong}টি</span> ভুল করেছো → <span className="text-destructive font-bold">-{deduction.toFixed(2)}</span> marks হারিয়েছো</p>
+                <p className="text-sm">{unanswered}টি blank রেখেছো → <span className="text-primary font-semibold">ভালো সিদ্ধান্ত ছিলো</span></p>
+              </CardContent>
+            </Card>
+
+            {/* Guessing Risk Analyzer */}
+            <Card className="border-secondary/30 bg-secondary/5">
+              <CardContent className="p-6 space-y-3">
+                <p className="font-semibold text-center">🎲 Guessing Risk Analyzer</p>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="text-center p-3 rounded-lg bg-card">
+                    <p className="text-xs text-muted-foreground">Guess না করলে স্কোর হতো</p>
+                    <p className="text-xl font-bold text-primary">{correct}</p>
+                  </div>
+                  <div className="text-center p-3 rounded-lg bg-card">
+                    <p className="text-xs text-muted-foreground">Guess করে পেয়েছো</p>
+                    <p className="text-xl font-bold">{finalScore.toFixed(2)}</p>
+                  </div>
+                </div>
+                {wrong > 0 && (
+                  <div className="text-center text-sm">
+                    {finalScore > correct ? (
+                      <p className="text-primary font-semibold">✅ Guess করে লাভ হয়েছে! +{(finalScore - correct).toFixed(2)} marks বেশি পেয়েছো</p>
+                    ) : (
+                      <p className="text-destructive font-semibold">❌ Guess করে ক্ষতি হয়েছে! {(correct - finalScore).toFixed(2)} marks কম পেয়েছো</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      💡 পরামর্শ: {wrong > correct ? 'বেশি guess করো না, না জানলে blank রাখো' : 'তোমার guess accuracy ভালো, কিন্তু সতর্ক থেকো'}
+                    </p>
+                  </div>
+                )}
+                {wrong === 0 && unanswered > 0 && (
+                  <p className="text-center text-sm text-primary font-semibold">🎯 চমৎকার! তুমি কোনো ভুল guess করোনি!</p>
+                )}
+              </CardContent>
+            </Card>
+          </>
         ) : null}
 
         <h3 className="text-lg font-bold">প্রশ্নভিত্তিক বিশ্লেষণ</h3>
