@@ -11,11 +11,28 @@ import { Switch } from '@/components/ui/switch';
 import { Moon, Sun, Link2, Check } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faGear, faBookOpen, faGraduationCap, faUserGraduate, faPaw, faBolt, faFire,
+  faStar, faDumbbell, faTrophy, faBullseye, faCalendarDays, faLink, faCheck as faCheckFA
+} from '@fortawesome/free-solid-svg-icons';
 
-const AVATARS = ['📚', '🎓', '👨‍🎓', '👩‍🎓', '🦁', '🐯', '⚡', '🔥', '🌟', '💪', '🏆', '🎯'];
+const AVATARS = [
+  { icon: faBookOpen, label: "BookOpen" },
+  { icon: faGraduationCap, label: "GraduationCap" },
+  { icon: faUserGraduate, label: "UserGraduate" },
+  { icon: faUserGraduate, label: "UserGraduate2" },
+  { icon: faPaw, label: "Paw1" },
+  { icon: faPaw, label: "Paw2" },
+  { icon: faBolt, label: "Bolt" },
+  { icon: faFire, label: "Fire" },
+  { icon: faStar, label: "Star" },
+  { icon: faDumbbell, label: "Dumbbell" },
+  { icon: faTrophy, label: "Trophy" },
+  { icon: faBullseye, label: "Bullseye" },
+];
 
 const EXAM_OPTIONS = [
   'SSC 2025', 'SSC 2026', 'HSC 2025', 'HSC 2026',
@@ -28,7 +45,7 @@ const SettingsPage: React.FC = () => {
   const [name, setName] = useState(profile?.name || '');
   const [classLevel, setClassLevel] = useState(profile?.class_level || '');
   const [targetExam, setTargetExam] = useState(profile?.target_exam || '');
-  const [avatarEmoji, setAvatarEmoji] = useState(profile?.avatar_emoji || '📚');
+  const [avatarIdx, setAvatarIdx] = useState(0);
   const [examDate, setExamDate] = useState<Date | undefined>(profile?.exam_date ? new Date(profile.exam_date) : undefined);
   const [saving, setSaving] = useState(false);
   const [linkingCode, setLinkingCode] = useState('');
@@ -42,7 +59,6 @@ const SettingsPage: React.FC = () => {
   const checkParentLink = async () => {
     const { data } = await supabase.from('parent_links').select('*').eq('child_id', user!.id).eq('status', 'linked');
     if (data && data.length > 0) setParentLinked(true);
-    // Check for existing pending code
     const { data: pending } = await supabase.from('parent_links').select('*').eq('child_id', user!.id).eq('status', 'pending');
     if (pending && pending.length > 0) setLinkingCode(pending[0].linking_code);
   };
@@ -61,7 +77,7 @@ const SettingsPage: React.FC = () => {
     setSaving(true);
     const cl = targetExam.includes('SSC') ? 'SSC' : targetExam.includes('HSC') ? 'HSC' : 'Admission';
     await supabase.from('profiles').update({
-      name, class_level: cl, target_exam: targetExam, avatar_emoji: avatarEmoji,
+      name, class_level: cl, target_exam: targetExam, avatar_emoji: AVATARS[avatarIdx].label,
       exam_date: examDate ? format(examDate, 'yyyy-MM-dd') : null,
     }).eq('id', profile.id);
     await refreshProfile();
@@ -71,7 +87,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="max-w-lg mx-auto space-y-6 pb-20 md:pb-0">
-      <h2 className="text-2xl font-bold">⚙️ সেটিংস</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon={faGear} className="mr-2 text-primary" /> সেটিংস</h2>
 
       <Card>
         <CardHeader><CardTitle>প্রোফাইল</CardTitle></CardHeader>
@@ -83,10 +99,10 @@ const SettingsPage: React.FC = () => {
           <div>
             <Label>অ্যাভাটার</Label>
             <div className="grid grid-cols-6 gap-2 mt-2">
-              {AVATARS.map((emoji) => (
-                <button key={emoji} onClick={() => setAvatarEmoji(emoji)}
-                  className={`text-2xl p-2 rounded-lg border transition-all ${avatarEmoji === emoji ? 'bg-primary/20 border-primary scale-110' : 'border-border hover:border-primary/50'}`}>
-                  {emoji}
+              {AVATARS.map((av, idx) => (
+                <button key={av.label} onClick={() => setAvatarIdx(idx)}
+                  className={`text-2xl p-2 rounded-lg border transition-all ${avatarIdx === idx ? 'bg-primary/20 border-primary scale-110' : 'border-border hover:border-primary/50'}`}>
+                  <FontAwesomeIcon icon={av.icon} className={avatarIdx === idx ? "text-primary" : ""} />
                 </button>
               ))}
             </div>
@@ -106,7 +122,7 @@ const SettingsPage: React.FC = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Button variant="outline" className={cn("w-full justify-start text-left font-normal mt-2", !examDate && "text-muted-foreground")}>
-                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <FontAwesomeIcon icon={faCalendarDays} className="mr-2" />
                   {examDate ? format(examDate, 'PPP') : 'তারিখ বেছে নাও'}
                 </Button>
               </PopoverTrigger>
@@ -116,7 +132,7 @@ const SettingsPage: React.FC = () => {
             </Popover>
             {examDate && (
               <p className="text-sm text-primary font-semibold mt-2">
-                পরীক্ষার আর {differenceInDays(examDate, new Date())} দিন বাকি 🔥
+                <FontAwesomeIcon icon={faFire} className="mr-1" /> পরীক্ষার আর {differenceInDays(examDate, new Date())} দিন বাকি
               </p>
             )}
           </div>
@@ -183,13 +199,12 @@ const SettingsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Parent linking */}
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2"><Link2 className="h-5 w-5" /> অভিভাবক সংযোগ</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2"><FontAwesomeIcon icon={faLink} className="text-primary" /> অভিভাবক সংযোগ</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           {parentLinked ? (
             <div className="flex items-center gap-2 text-sm text-green-600">
-              <Check className="h-4 w-4" /> আপনার অভিভাবক যুক্ত আছেন ✓
+              <FontAwesomeIcon icon={faCheckFA} /> আপনার অভিভাবক যুক্ত আছেন
             </div>
           ) : (
             <>

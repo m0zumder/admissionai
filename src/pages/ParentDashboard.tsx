@@ -8,6 +8,9 @@ import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { Flame, Trophy, AlertTriangle, BookOpen, Send } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faChartBar, faClipboard, faHeart, faPaperPlane, faShareFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
 const ParentDashboard: React.FC = () => {
   const { profile, user } = useAuth();
@@ -25,7 +28,6 @@ const ParentDashboard: React.FC = () => {
 
   const loadChildData = async () => {
     setLoading(true);
-    // Find linked child
     const { data: links } = await supabase
       .from('parent_links')
       .select('*')
@@ -38,16 +40,12 @@ const ParentDashboard: React.FC = () => {
     }
 
     const childId = links[0].child_id;
-
-    // Get child profile
     const { data: cp } = await supabase.from('profiles').select('*').eq('id', childId).single();
     if (cp) setChildProfile(cp);
 
-    // Get weak topics
     const { data: wt } = await supabase.from('weak_topics').select('*, topics(name_bn)').eq('user_id', childId).order('wrong_count', { ascending: false }).limit(3);
     setWeakTopics(wt || []);
 
-    // Get weekly MCQ sessions
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const { data: sessions } = await supabase.from('mcq_sessions').select('*').eq('user_id', childId).gte('created_at', weekAgo.toISOString());
@@ -57,7 +55,6 @@ const ParentDashboard: React.FC = () => {
       const correct = sessions.reduce((a, s) => a + s.correct_answers, 0);
       setWeeklyMcq({ total, correct });
 
-      // Build chart data
       const days = ['শনি', 'রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র'];
       const chartData = days.map((day, i) => {
         const dayDate = new Date();
@@ -81,7 +78,7 @@ const ParentDashboard: React.FC = () => {
       message: message.trim(),
     });
     if (error) toast.error('বার্তা পাঠাতে সমস্যা হয়েছে');
-    else { toast.success('বার্তা পাঠানো হয়েছে! 💙'); setMessage(''); }
+    else { toast.success('বার্তা পাঠানো হয়েছে!'); setMessage(''); }
     setSending(false);
   };
 
@@ -104,7 +101,7 @@ const ParentDashboard: React.FC = () => {
   if (!childProfile) {
     return (
       <div className="max-w-md mx-auto text-center space-y-4 py-16">
-        <p className="text-4xl">👨‍👩‍👧</p>
+        <FontAwesomeIcon icon={faUsers} className="text-4xl text-primary" />
         <h2 className="text-2xl font-bold">কোনো সন্তান যুক্ত নেই</h2>
         <p className="text-muted-foreground">আপনার সন্তানকে তার Settings পেজ থেকে Linking Code তৈরি করতে বলুন, তারপর সেই কোড দিয়ে লগইন করুন।</p>
       </div>
@@ -115,10 +112,9 @@ const ParentDashboard: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-20 md:pb-0 animate-fade-in">
-      <h2 className="text-2xl font-bold">👨‍👩‍👧 অভিভাবক ড্যাশবোর্ড</h2>
+      <h2 className="text-2xl font-bold"><FontAwesomeIcon icon={faUsers} className="mr-2 text-primary" /> অভিভাবক ড্যাশবোর্ড</h2>
       <p className="text-muted-foreground">{childProfile.name || 'সন্তান'} এর পড়াশোনার অগ্রগতি</p>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
@@ -137,19 +133,18 @@ const ParentDashboard: React.FC = () => {
           <CardContent className="p-4 text-center">
             <Flame className="h-6 w-6 mx-auto mb-2 text-orange-500" />
             <p className="text-2xl font-bold">{childProfile.study_streak || 0}</p>
-            <p className="text-xs text-muted-foreground">দিনের Streak 🔥</p>
+            <p className="text-xs text-muted-foreground">দিনের Streak</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <Trophy className="h-6 w-6 mx-auto mb-2 text-secondary" />
-            <p className="text-sm font-bold">{childProfile.user_level || 'নবীন 📖'}</p>
+            <p className="text-sm font-bold">{childProfile.user_level || 'নবীন'}</p>
             <p className="text-xs text-muted-foreground">{childProfile.xp_points || 0} XP</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Weak topics */}
       {weakTopics.length > 0 && (
         <Card>
           <CardHeader><CardTitle className="text-lg flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-destructive" /> দুর্বল বিষয় (Top 3)</CardTitle></CardHeader>
@@ -164,9 +159,8 @@ const ParentDashboard: React.FC = () => {
         </Card>
       )}
 
-      {/* Weekly chart */}
       <Card>
-        <CardHeader><CardTitle className="text-lg">📊 গত ৭ দিনের কার্যকলাপ</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon={faChartBar} className="mr-2 text-primary" /> গত ৭ দিনের কার্যকলাপ</CardTitle></CardHeader>
         <CardContent>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -182,9 +176,8 @@ const ParentDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Weekly report card */}
       <Card className="border-primary/30">
-        <CardHeader><CardTitle className="text-lg">📋 এই সপ্তাহের রিপোর্ট কার্ড</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon={faClipboard} className="mr-2 text-primary" /> এই সপ্তাহের রিপোর্ট কার্ড</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="p-3 bg-muted rounded-lg"><span className="text-muted-foreground">মোট MCQ:</span> <strong>{weeklyMcq.total} টি</strong></div>
@@ -193,18 +186,17 @@ const ParentDashboard: React.FC = () => {
             <div className="p-3 bg-muted rounded-lg"><span className="text-muted-foreground">Level:</span> <strong>{childProfile.user_level || 'নবীন'}</strong></div>
           </div>
           <Button variant="outline" className="w-full" onClick={generateWhatsAppReport}>
-            📤 WhatsApp এ রিপোর্ট পাঠাও
+            <FontAwesomeIcon icon={faWhatsapp} className="mr-2" /> WhatsApp এ রিপোর্ট পাঠাও
           </Button>
         </CardContent>
       </Card>
 
-      {/* Send message */}
       <Card>
-        <CardHeader><CardTitle className="text-lg">💙 সন্তানকে বার্তা পাঠাও</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-lg"><FontAwesomeIcon icon={faHeart} className="mr-2 text-blue-500" /> সন্তানকে বার্তা পাঠাও</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="উৎসাহমূলক বার্তা লেখো..." rows={3} />
           <Button className="w-full" onClick={sendMessage} disabled={sending || !message.trim()}>
-            <Send className="h-4 w-4 mr-2" /> {sending ? 'পাঠানো হচ্ছে...' : 'পাঠাও'}
+            <FontAwesomeIcon icon={faPaperPlane} className="mr-2" /> {sending ? 'পাঠানো হচ্ছে...' : 'পাঠাও'}
           </Button>
         </CardContent>
       </Card>

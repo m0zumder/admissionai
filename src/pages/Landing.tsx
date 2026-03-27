@@ -2,16 +2,21 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBrain, faLightbulb, faPenFancy, faCamera, faChartBar, faFileAlt,
+  faGlobe, faGift, faMoon, faMoneyBill, faLock, faImage,
+  faStar, faFlag, faRocket, faClock, faTrophy, faComments, faCreditCard, faEye
+} from "@fortawesome/free-solid-svg-icons";
 import logo from "@/assets/logo.png";
 
 const features = [
-  { icon: "🧠", title: "MCQ Practice", desc: "Board pattern অনুযায়ী হাজারো MCQ" },
-  { icon: "💡", title: "বুঝিয়ে দাও", desc: "যেকোনো topic সহজ বাংলায়" },
-  { icon: "✍️", title: "সৃজনশীল Builder", desc: "উদ্দীপক দাও, উত্তর পাও" },
-  { icon: "📸", title: "ছবি থেকে সমাধান", desc: "ছবি তুলো, AI সমাধান দাও" },
-  { icon: "📊", title: "Progress Tracker", desc: "কোথায় দুর্বল জানো" },
-  { icon: "📄", title: "মক পরীক্ষা", desc: "পরীক্ষার পরিবেশে অনুশীলন" },
+  { icon: faBrain, title: "MCQ Practice", desc: "Board pattern অনুযায়ী হাজারো MCQ" },
+  { icon: faLightbulb, title: "বুঝিয়ে দাও", desc: "যেকোনো topic সহজ বাংলায়" },
+  { icon: faPenFancy, title: "সৃজনশীল Builder", desc: "উদ্দীপক দাও, উত্তর পাও" },
+  { icon: faCamera, title: "ছবি থেকে সমাধান", desc: "ছবি তুলো, AI সমাধান দাও" },
+  { icon: faChartBar, title: "Progress Tracker", desc: "কোথায় দুর্বল জানো" },
+  { icon: faFileAlt, title: "মক পরীক্ষা", desc: "পরীক্ষার পরিবেশে অনুশীলন" },
 ];
 
 const stats = [
@@ -36,28 +41,28 @@ const testimonials = [
 
 const competitorComparisons = [
   {
-    icon: "🌐",
+    icon: faGlobe,
     title: "Web-based — কোনো App লাগবে না",
     desc: "Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল — সব সাপোর্ট। App crash এর চিন্তা নেই।",
   },
   {
-    icon: "🆓",
+    icon: faGift,
     title: "Free তেই AI ফিচার",
     desc: "MCQ, Topic Explain, সৃজনশীল, ছবি থেকে সমাধান — সব AI ফিচার Free plan এ পাওয়া যায়। কোনো Sales Call আসবে না।",
   },
   {
-    icon: "🌙",
+    icon: faMoon,
     title: "Anytime, Anywhere — AI সবসময় Available",
     desc: "রাত ৩টায়ও প্রশ্ন করো, সাথে সাথে উত্তর পাবে। কোনো ক্লাস cancel হবে না। 24/7/365 AI শিক্ষক তোমার পাশে।",
   },
-  { icon: "🔒", title: "Google Login — ঝামেলা নেই", desc: "শুধু Google দিয়ে লগ ইন করো। কোনো OTP ঝামেলা নেই।" },
+  { icon: faLock, title: "Google Login — ঝামেলা নেই", desc: "শুধু Google দিয়ে লগ ইন করো। কোনো OTP ঝামেলা নেই।" },
   {
-    icon: "📸",
+    icon: faImage,
     title: "ছবি তুলে সমাধান পাও",
     desc: "প্রশ্নের ছবি তোলো — AI ধাপে ধাপে বাংলায় সমাধান দেবে। গণিত, পদার্থবিজ্ঞান, রসায়ন সব কাজ করে।",
   },
   {
-    icon: "💸",
+    icon: faMoneyBill,
     title: "মাত্র ৳199/মাস",
     desc: "Other's Platform ৳800-2000, ৳500+। আমাদের Student Plan মাত্র ৳199/মাস। সেরা ফিচার, সেরা দাম।",
   },
@@ -68,7 +73,7 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Slim yellow web-first banner */}
       <div className="bg-amber-400 text-amber-950 text-center py-2 px-4 text-sm font-medium">
-        24/7 Available AI Tutor - মাত্র ৳199/মাস
+        <FontAwesomeIcon icon={faClock} className="mr-1" /> 24/7 Available AI Tutor - মাত্র ৳199/মাস
       </div>
 
       {/* Navbar */}
@@ -80,13 +85,13 @@ const LandingPage: React.FC = () => {
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-              ফিচারস
+              <FontAwesomeIcon icon={faStar} className="mr-1" /> ফিচারস
             </a>
             <a href="#why-us" className="text-muted-foreground hover:text-foreground transition-colors">
-              কেন আমরা?
+              <FontAwesomeIcon icon={faFlag} className="mr-1" /> কেন আমরা?
             </a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-              প্রাইসিং
+              <FontAwesomeIcon icon={faMoneyBill} className="mr-1" /> প্রাইসিং
             </a>
             <Link to="/login">
               <Button variant="outline" size="sm">
@@ -94,11 +99,11 @@ const LandingPage: React.FC = () => {
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="sm">বিনামূল্যে শুরু করো</Button>
+              <Button size="sm"><FontAwesomeIcon icon={faRocket} className="mr-1" /> বিনামূল্যে শুরু করো</Button>
             </Link>
           </div>
           <Link to="/login" className="md:hidden">
-            <Button size="sm">শুরু করো</Button>
+            <Button size="sm"><FontAwesomeIcon icon={faRocket} className="mr-1" /> শুরু করো</Button>
           </Link>
         </div>
       </nav>
@@ -117,7 +122,7 @@ const LandingPage: React.FC = () => {
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
           </p>
           <p className="text-sm text-primary/80 font-semibold mb-6 animate-fade-in-delay-2">
-            🕐 Anytime, Anywhere — দিনে রাতে যখন খুশি পড়ো, AI সবসময় তোমার পাশে
+            <FontAwesomeIcon icon={faClock} className="mr-1" /> Anytime, Anywhere — দিনে রাতে যখন খুশি পড়ো, AI সবসময় তোমার পাশে
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-3">
             <Link to="/login">
@@ -125,7 +130,7 @@ const LandingPage: React.FC = () => {
                 size="lg"
                 className="text-lg px-8 py-6 w-full sm:w-auto btn-ripple hover:scale-105 transition-transform"
               >
-                বিনামূল্যে শুরু করো
+                <FontAwesomeIcon icon={faRocket} className="mr-2" /> বিনামূল্যে শুরু করো
               </Button>
             </Link>
             <a href="#features">
@@ -134,7 +139,7 @@ const LandingPage: React.FC = () => {
                 size="lg"
                 className="text-lg px-8 py-6 w-full sm:w-auto hover:scale-105 transition-transform"
               >
-                কীভাবে কাজ করে?
+                <FontAwesomeIcon icon={faLightbulb} className="mr-2" /> কীভাবে কাজ করে?
               </Button>
             </a>
           </div>
@@ -143,7 +148,7 @@ const LandingPage: React.FC = () => {
           <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             <Card className="animate-slide-left animate-float glass-card card-hover">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold mb-2">📝 Sample MCQ</p>
+                <p className="text-sm font-semibold mb-2"><FontAwesomeIcon icon={faPenFancy} className="mr-1 text-primary" /> Sample MCQ</p>
                 <p className="text-sm text-muted-foreground">পানি কত ডিগ্রি সেলসিয়াসে ফুটে?</p>
                 <div className="mt-2 space-y-1">
                   <div className="text-xs bg-muted rounded px-2 py-1">ক) ৫০°C</div>
@@ -153,7 +158,7 @@ const LandingPage: React.FC = () => {
             </Card>
             <Card className="animate-slide-right animate-float-delayed glass-card card-hover">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold mb-2">📸 ছবি থেকে সমাধান</p>
+                <p className="text-sm font-semibold mb-2"><FontAwesomeIcon icon={faCamera} className="mr-1 text-primary" /> ছবি থেকে সমাধান</p>
                 <p className="text-sm text-muted-foreground">প্রশ্নের ছবি তোলো → AI ধাপে ধাপে সমাধান দেয় বাংলায়!</p>
               </CardContent>
             </Card>
@@ -163,7 +168,7 @@ const LandingPage: React.FC = () => {
 
       {/* Features */}
       <section id="features" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">আমাদের ফিচারস</h2>
+        <h2 className="text-3xl font-bold text-center mb-12"><FontAwesomeIcon icon={faStar} className="mr-2 text-primary" /> আমাদের ফিচারস</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, index) => (
             <Card
@@ -172,8 +177,8 @@ const LandingPage: React.FC = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardContent className="p-6">
-                <div className="text-4xl mb-4 animate-bounce-in" style={{ animationDelay: `${index * 0.1 + 0.3}s` }}>
-                  {f.icon}
+                <div className="text-4xl mb-4 animate-bounce-in text-primary" style={{ animationDelay: `${index * 0.1 + 0.3}s` }}>
+                  <FontAwesomeIcon icon={f.icon} />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
@@ -199,7 +204,7 @@ const LandingPage: React.FC = () => {
 
       {/* Why Us - Competitor pain points */}
       <section id="why-us" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">কেন Admission AI সেরা?</h2>
+        <h2 className="text-3xl font-bold text-center mb-4"><FontAwesomeIcon icon={faTrophy} className="mr-2 text-primary" /> কেন Admission AI সেরা?</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto"></p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {competitorComparisons.map((item, index) => (
@@ -209,7 +214,7 @@ const LandingPage: React.FC = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardContent className="p-6">
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="text-3xl mb-3 text-primary"><FontAwesomeIcon icon={item.icon} /></div>
                 <h3 className="font-bold mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </CardContent>
@@ -220,7 +225,7 @@ const LandingPage: React.FC = () => {
 
       {/* Testimonials */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">শিক্ষার্থীদের মতামত</h2>
+        <h2 className="text-3xl font-bold text-center mb-12"><FontAwesomeIcon icon={faComments} className="mr-2 text-primary" /> শিক্ষার্থীদের মতামত</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, index) => (
             <Card
@@ -231,9 +236,10 @@ const LandingPage: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex gap-1 mb-3">
                   {[...Array(5)].map((_, i) => (
-                    <Star
+                    <FontAwesomeIcon
                       key={i}
-                      className="h-4 w-4 fill-secondary text-secondary animate-bounce-in"
+                      icon={faStar}
+                      className="h-4 w-4 text-secondary animate-bounce-in"
                       style={{ animationDelay: `${index * 0.15 + i * 0.05 + 0.3}s` }}
                     />
                   ))}
@@ -251,11 +257,11 @@ const LandingPage: React.FC = () => {
 
       {/* Pricing preview */}
       <section id="pricing" className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">সাশ্রয়ী মূল্য</h2>
+        <h2 className="text-3xl font-bold text-center mb-4"><FontAwesomeIcon icon={faCreditCard} className="mr-2 text-primary" /> সাশ্রয়ী মূল্য</h2>
         <p className="text-center text-muted-foreground mb-12">তোমার পড়াশোনার জন্য সেরা প্ল্যান বেছে নাও</p>
         <div className="text-center">
           <Link to="/pricing">
-            <Button size="lg">সব প্ল্যান দেখো</Button>
+            <Button size="lg"><FontAwesomeIcon icon={faEye} className="mr-2" /> সব প্ল্যান দেখো</Button>
           </Link>
         </div>
       </section>
@@ -266,7 +272,7 @@ const LandingPage: React.FC = () => {
           <img src={logo} alt="Admission AI" className="h-12 w-12 rounded-full mx-auto mb-3" />
           <p className="text-xl font-bold mb-2">Admission AI</p>
           <p className="text-sm opacity-70 mb-2">Smart Learning, Simplified Prep</p>
-          <p className="text-sm opacity-70 mb-4">বাংলাদেশের শিক্ষার্থীদের জন্য AI-powered শিক্ষা প্ল্যাটফর্ম</p>
+          <p className="text-sm opacity-70 mb-4"><FontAwesomeIcon icon={faFlag} className="mr-1" /> বাংলাদেশের শিক্ষার্থীদের জন্য AI-powered শিক্ষা প্ল্যাটফর্ম</p>
           <p className="text-xs opacity-50">© 2026 Admission AI. All rights reserved Mozlish Studio.</p>
         </div>
       </footer>
