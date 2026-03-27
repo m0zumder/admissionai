@@ -9,6 +9,18 @@ import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Moon, Sun } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+const AVATARS = ['📚', '🎓', '👨‍🎓', '👩‍🎓', '🦁', '🐯', '⚡', '🔥', '🌟', '💪', '🏆', '🎯'];
+
+const EXAM_OPTIONS = [
+  'SSC 2025', 'SSC 2026', 'HSC 2025', 'HSC 2026',
+  'Medical ভর্তি', 'BUET ভর্তি', 'GST', 'ঢাকা বিশ্ববিদ্যালয়',
+];
 
 const SettingsPage: React.FC = () => {
   const { profile, refreshProfile, signOut } = useAuth();
@@ -16,13 +28,17 @@ const SettingsPage: React.FC = () => {
   const [name, setName] = useState(profile?.name || '');
   const [classLevel, setClassLevel] = useState(profile?.class_level || '');
   const [targetExam, setTargetExam] = useState(profile?.target_exam || '');
+  const [avatarEmoji, setAvatarEmoji] = useState(profile?.avatar_emoji || '📚');
+  const [examDate, setExamDate] = useState<Date | undefined>(profile?.exam_date ? new Date(profile.exam_date) : undefined);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     if (!profile) return;
     setSaving(true);
+    const cl = targetExam.includes('SSC') ? 'SSC' : targetExam.includes('HSC') ? 'HSC' : 'Admission';
     await supabase.from('profiles').update({
-      name, class_level: classLevel, target_exam: targetExam,
+      name, class_level: cl, target_exam: targetExam, avatar_emoji: avatarEmoji,
+      exam_date: examDate ? format(examDate, 'yyyy-MM-dd') : null,
     }).eq('id', profile.id);
     await refreshProfile();
     setSaving(false);
@@ -41,34 +57,44 @@ const SettingsPage: React.FC = () => {
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div>
-            <Label>ক্লাস</Label>
-            <div className="flex gap-2 mt-2">
-              {['SSC', 'HSC', 'Admission'].map((level) => (
-                <Button
-                  key={level}
-                  variant={classLevel === level ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setClassLevel(level)}
-                >
-                  {level}
+            <Label>অ্যাভাটার</Label>
+            <div className="grid grid-cols-6 gap-2 mt-2">
+              {AVATARS.map((emoji) => (
+                <button key={emoji} onClick={() => setAvatarEmoji(emoji)}
+                  className={`text-2xl p-2 rounded-lg border transition-all ${avatarEmoji === emoji ? 'bg-primary/20 border-primary scale-110' : 'border-border hover:border-primary/50'}`}>
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label>লক্ষ্য পরীক্ষা</Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {EXAM_OPTIONS.map((exam) => (
+                <Button key={exam} variant={targetExam === exam ? 'default' : 'outline'} size="sm" onClick={() => setTargetExam(exam)}>
+                  {exam}
                 </Button>
               ))}
             </div>
           </div>
           <div>
-            <Label>লক্ষ্য</Label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {['SSC 2025', 'HSC 2025', 'ঢাবি ভর্তি', 'বুয়েট ভর্তি', 'মেডিকেল ভর্তি'].map((exam) => (
-                <Button
-                  key={exam}
-                  variant={targetExam === exam ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setTargetExam(exam)}
-                >
-                  {exam}
+            <Label>পরীক্ষার তারিখ</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className={cn("w-full justify-start text-left font-normal mt-2", !examDate && "text-muted-foreground")}>
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {examDate ? format(examDate, 'PPP') : 'তারিখ বেছে নাও'}
                 </Button>
-              ))}
-            </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={examDate} onSelect={setExamDate} disabled={(date) => date < new Date()} initialFocus className="p-3 pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+            {examDate && (
+              <p className="text-sm text-primary font-semibold mt-2">
+                পরীক্ষার আর {differenceInDays(examDate, new Date())} দিন বাকি 🔥
+              </p>
+            )}
           </div>
           <Button className="w-full" onClick={handleSave} disabled={saving}>
             {saving ? 'সেভ হচ্ছে...' : 'সেভ করো'}
@@ -103,14 +129,8 @@ const SettingsPage: React.FC = () => {
             <Switch
               checked={document.documentElement.classList.contains('dark')}
               onCheckedChange={(checked) => {
-                if (checked) {
-                  document.documentElement.classList.add('dark');
-                  localStorage.setItem('theme', 'dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                  localStorage.setItem('theme', 'light');
-                }
-                // Force re-render
+                if (checked) { document.documentElement.classList.add('dark'); localStorage.setItem('theme', 'dark'); }
+                else { document.documentElement.classList.remove('dark'); localStorage.setItem('theme', 'light'); }
                 setName((n) => n);
               }}
             />
@@ -121,14 +141,10 @@ const SettingsPage: React.FC = () => {
       <Card>
         <CardHeader><CardTitle>অ্যাকাউন্ট</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <Button variant="outline" className="w-full" onClick={signOut}>
-            লগ আউট
-          </Button>
+          <Button variant="outline" className="w-full" onClick={signOut}>লগ আউট</Button>
           <Button variant="destructive" className="w-full" onClick={() => {
             toast({ title: 'যোগাযোগ করুন', description: 'অ্যাকাউন্ট মুছতে সাপোর্টে যোগাযোগ করুন।' });
-          }}>
-            অ্যাকাউন্ট মুছুন
-          </Button>
+          }}>অ্যাকাউন্ট মুছুন</Button>
         </CardContent>
       </Card>
     </div>
