@@ -68,12 +68,6 @@ const LandingPage: React.FC = () => {
           <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
             SSC, HSC এবং ভর্তি পরীক্ষার জন্য বাংলাদেশের সেরা AI শিক্ষক
           </p>
-          <div className="flex flex-wrap gap-3 justify-center text-sm text-muted-foreground mb-8">
-            <span className="bg-muted px-3 py-1 rounded-full">🌐 যেকোনো Device এ চলে</span>
-            <span className="bg-muted px-3 py-1 rounded-full">🆓 Free তে শুরু করো</span>
-            <span className="bg-muted px-3 py-1 rounded-full">🤖 AI 24/7 Available</span>
-            <span className="bg-muted px-3 py-1 rounded-full">📱 No App Install</span>
-          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/login">
               <Button size="lg" className="text-lg px-8 py-6 w-full sm:w-auto">
@@ -143,7 +137,7 @@ const LandingPage: React.FC = () => {
 
       {/* Why Us - Competitor pain points */}
       <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">কেন Admission AI?</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Smart Learning, Simplified Prep</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {[
             { icon: '🌐', title: 'Web-based — কোনো App লাগবে না', desc: 'Browser দিয়ে যেকোনো ডিভাইসে চলবে। ডেস্কটপ, ল্যাপটপ, ট্যাবলেট, মোবাইল সব সাপোর্ট করে।' },
