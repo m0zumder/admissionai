@@ -23,6 +23,11 @@ import CustomExam from "./pages/CustomExam";
 import ChanceCalculator from "./pages/ChanceCalculator";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFail from "./pages/PaymentFail";
+import FormulaSheet from "./pages/FormulaSheet";
+import Badges from "./pages/Badges";
+import Bookmarks from "./pages/Bookmarks";
+import Planner from "./pages/Planner";
+import Challenge from "./pages/Challenge";
 import NotFound from "./pages/NotFound";
 import WhatsAppButton from "./components/WhatsAppButton";
 
@@ -42,6 +47,12 @@ if (savedTheme === 'dark') {
   document.documentElement.classList.add('dark');
 }
 
+// Initialize font size
+const savedFontSize = localStorage.getItem('fontSize');
+if (savedFontSize) {
+  document.documentElement.setAttribute('data-font-size', savedFontSize);
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -54,6 +65,8 @@ const App = () => (
             <Route path="/payment-fail" element={<PaymentFail />} />
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/formula-sheet" element={<FormulaSheet />} />
+            <Route path="/challenge/:code" element={<Challenge />} />
             <Route path="/dashboard" element={<DashboardRoute><Dashboard /></DashboardRoute>} />
             <Route path="/mcq" element={<DashboardRoute><MCQ /></DashboardRoute>} />
             <Route path="/photo-solve" element={<DashboardRoute><PhotoSolve /></DashboardRoute>} />
@@ -67,6 +80,9 @@ const App = () => (
             <Route path="/settings" element={<DashboardRoute><Settings /></DashboardRoute>} />
             <Route path="/notebook" element={<DashboardRoute><Notebook /></DashboardRoute>} />
             <Route path="/leaderboard" element={<DashboardRoute><Leaderboard /></DashboardRoute>} />
+            <Route path="/badges" element={<DashboardRoute><Badges /></DashboardRoute>} />
+            <Route path="/bookmarks" element={<DashboardRoute><Bookmarks /></DashboardRoute>} />
+            <Route path="/planner" element={<DashboardRoute><Planner /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />

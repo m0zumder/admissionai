@@ -15,6 +15,12 @@ type Profile = {
   last_reset_date: string;
   avatar_emoji: string | null;
   exam_date: string | null;
+  xp_points?: number;
+  user_level?: string;
+  study_streak?: number;
+  last_activity_date?: string;
+  weekly_xp?: number;
+  font_size?: string;
 };
 
 type AuthContextType = {

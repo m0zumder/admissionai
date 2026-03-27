@@ -9,9 +9,13 @@ import { NavLink } from '@/components/NavLink';
 import {
   LayoutDashboard, BookOpen, Lightbulb, PenTool, FileText,
   BarChart3, CreditCard, Settings, LogOut, Menu, ClipboardList, Trophy, Camera, Target, Calculator,
+  Award, Bookmark, CalendarDays, Search, BookText,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { GlobalSearch, useGlobalSearch } from '@/components/GlobalSearch';
+import { getLevelProgress } from '@/hooks/useXP';
 import logo from '@/assets/logo.png';
 
 const navItems = [
@@ -24,6 +28,10 @@ const navItems = [
   { title: 'মক পরীক্ষা', url: '/mock-exam', icon: ClipboardList },
   { title: 'Custom Exam', url: '/custom-exam', icon: Target },
   { title: 'ভর্তি সম্ভাবনা', url: '/chance', icon: Calculator },
+  { title: 'সূত্র শীট', url: '/formula-sheet', icon: BookText },
+  { title: 'পড়ার পরিকল্পনা', url: '/planner', icon: CalendarDays },
+  { title: 'বুকমার্কস', url: '/bookmarks', icon: Bookmark },
+  { title: 'ব্যাজ ও অর্জন', url: '/badges', icon: Award },
   { title: 'প্রগ্রেস', url: '/progress', icon: BarChart3 },
   { title: 'লিডারবোর্ড', url: '/leaderboard', icon: Trophy },
   { title: 'প্রাইসিং', url: '/pricing', icon: CreditCard },
@@ -39,6 +47,10 @@ function AppSidebarContent() {
   const planLabel = profile?.subscription_plan === 'premium' ? 'Premium' : profile?.subscription_plan === 'student' ? 'Student' : 'Free';
   const planColor = profile?.subscription_plan === 'premium' ? 'bg-secondary text-secondary-foreground' : profile?.subscription_plan === 'student' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground';
   const avatarEmoji = (profile as any)?.avatar_emoji || '📚';
+  const xp = (profile as any)?.xp_points || 0;
+  const level = (profile as any)?.user_level || 'নবীন 📖';
+  const streak = (profile as any)?.study_streak || 0;
+  const { progress, xpNeeded } = getLevelProgress(xp);
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
@@ -49,10 +61,20 @@ function AppSidebarContent() {
               <span className="text-3xl">{avatarEmoji}</span>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{profile?.name || 'শিক্ষার্থী'}</p>
-                <p className="text-xs opacity-70">{profile?.target_exam || profile?.class_level || 'ক্লাস নির্বাচন করুন'}</p>
+                <p className="text-xs opacity-70">{level}</p>
               </div>
             </div>
-            <Badge className={`mt-2 text-xs ${planColor}`}>{planLabel}</Badge>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge className={`text-xs ${planColor}`}>{planLabel}</Badge>
+              {streak > 0 && <span className="text-xs font-bold text-orange-400">🔥 {streak} দিন</span>}
+            </div>
+            <div className="mt-2">
+              <div className="flex justify-between text-xs opacity-70 mb-1">
+                <span>{xp} XP</span>
+                {xpNeeded > 0 && <span>আর {xpNeeded} XP</span>}
+              </div>
+              <Progress value={progress} className="h-1.5" />
+            </div>
           </div>
         )}
         <SidebarGroup>
@@ -94,7 +116,7 @@ function AppSidebarContent() {
 }
 
 export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const location = useLocation();
+  const { open: searchOpen, setOpen: setSearchOpen } = useGlobalSearch();
 
   return (
     <SidebarProvider>
@@ -109,6 +131,15 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
               <img src={logo} alt="Admission AI" className="h-8 w-8 rounded-full" />
               <h1 className="text-lg font-bold text-primary">Admission AI</h1>
             </div>
+            <div className="flex-1" />
+            <Button variant="outline" size="sm" className="hidden md:flex items-center gap-2 text-muted-foreground" onClick={() => setSearchOpen(true)}>
+              <Search className="h-4 w-4" />
+              <span className="text-xs">খুঁজুন...</span>
+              <kbd className="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">⌘K</kbd>
+            </Button>
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setSearchOpen(true)}>
+              <Search className="h-5 w-5" />
+            </Button>
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-auto">
             {children}
@@ -135,6 +166,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           </nav>
         </div>
       </div>
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </SidebarProvider>
   );
 };

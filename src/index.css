@@ -89,6 +89,10 @@
     @apply bg-background text-foreground;
     font-family: 'Hind Siliguri', sans-serif;
   }
+
+  [data-font-size="small"] body { font-size: 14px; }
+  [data-font-size="medium"] body { font-size: 16px; }
+  [data-font-size="large"] body { font-size: 18px; }
 }
 
 @layer utilities {

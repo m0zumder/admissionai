@@ -9,6 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { ThinkingDots, UpgradeModal } from '@/components/SharedUI';
+import { ErrorReportModal } from '@/components/ErrorReportModal';
+import { useXP } from '@/hooks/useXP';
+import { useToast } from '@/hooks/use-toast';
+import { Bookmark, Share2, Swords } from 'lucide-react';
 
 type MCQQuestion = {
   question: string;
@@ -41,8 +45,10 @@ const ImportanceBadge: React.FC<{ importance: string }> = ({ importance }) => {
 };
 
 const MCQPage: React.FC = () => {
-  const { profile, refreshProfile } = useAuth();
+  const { profile, user, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const { addXP, checkAndAwardBadges } = useXP();
+  const { toast } = useToast();
   const [subjects, setSubjects] = useState<any[]>([]);
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -57,15 +63,15 @@ const MCQPage: React.FC = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [highChanceOnly, setHighChanceOnly] = useState(false);
+  const [showErrorReport, setShowErrorReport] = useState(false);
+  const [challengeLoading, setChallengeLoading] = useState(false);
 
   const classLevel = profile?.class_level || 'SSC';
   const targetExam = profile?.target_exam || '';
-  // Extract HSC stream from target_exam e.g. "HSC 2025 (science)"
   const hscStream = targetExam.match(/\((science|humanities|commerce)\)/)?.[1] || '';
 
   useEffect(() => {
     let query = supabase.from('subjects').select('*').eq('class_level', classLevel);
-    // Filter HSC subjects by stream
     if (classLevel === 'HSC' && hscStream) {
       query = query.or(`stream.eq.${hscStream},stream.eq.compulsory`);
     }
@@ -79,6 +85,14 @@ const MCQPage: React.FC = () => {
         .then(({ data }) => setTopics(data || []));
     }
   }, [selectedSubject]);
+
+  // Track page visit
+  useEffect(() => {
+    const existing = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    const entry = { title: 'MCQ অনুশীলন', path: '/mcq' };
+    const filtered = existing.filter((e: any) => e.path !== entry.path);
+    localStorage.setItem('recentlyViewed', JSON.stringify([entry, ...filtered].slice(0, 10)));
+  }, []);
 
   const filteredTopics = highChanceOnly
     ? topics.filter(t => t.importance === 'critical' || t.importance === 'high')
@@ -120,11 +134,17 @@ const MCQPage: React.FC = () => {
     setLoading(false);
   };
 
-  const handleAnswer = (idx: number) => {
+  const handleAnswer = async (idx: number) => {
     if (selectedAnswer !== null) return;
     setSelectedAnswer(idx);
     setShowExplanation(true);
-    if (questions[currentQ].options[idx].isCorrect) setScore(s => s + 1);
+    const correct = questions[currentQ].options[idx].isCorrect;
+    if (correct) {
+      setScore(s => s + 1);
+      await addXP(10);
+    } else {
+      await addXP(5);
+    }
   };
 
   const nextQuestion = () => {
@@ -148,6 +168,7 @@ const MCQPage: React.FC = () => {
         last_reset_date: today,
       }).eq('id', profile.id);
       refreshProfile();
+      checkAndAwardBadges();
     }
   };
 
@@ -156,6 +177,64 @@ const MCQPage: React.FC = () => {
     const subjectName = subjects.find(s => s.id === selectedSubject)?.name_bn || '';
     const query = topicName || subjectName || questions[currentQ]?.question?.slice(0, 60) || '';
     navigate(`/explain?topic=${encodeURIComponent(query)}`);
+  };
+
+  const handleBookmarkQuestion = async () => {
+    if (!user) return;
+    const q = questions[currentQ];
+    await supabase.from('bookmarks' as any).insert({
+      user_id: user.id,
+      content_type: 'mcq',
+      content_preview: q.question.slice(0, 200),
+      subject: subjects.find(s => s.id === selectedSubject)?.name_bn || '',
+    });
+    toast({ title: '🔖 বুকমার্ক করা হয়েছে' });
+  };
+
+  const handleChallenge = async () => {
+    if (!user || !selectedSubject) return;
+    setChallengeLoading(true);
+    const code = Math.random().toString(36).substring(2, 8);
+    const subjectName = subjects.find(s => s.id === selectedSubject)?.name_bn || '';
+
+    // Generate 10 questions for the challenge
+    const subjectEn = subjects.find(s => s.id === selectedSubject)?.name_en || '';
+    let qs: MCQQuestion[] = [];
+    try {
+      const { data } = await supabase.functions.invoke('generate-mcq', {
+        body: { subject: subjectEn, topic: 'General', classLevel, count: 10 },
+      });
+      qs = data?.questions || [];
+    } catch {
+      qs = Array.from({ length: 10 }, (_, i) => ({
+        question: `${subjectEn} চ্যালেঞ্জ প্রশ্ন ${i + 1}`,
+        options: [
+          { text: 'বিকল্প ক', isCorrect: i % 4 === 0 },
+          { text: 'বিকল্প খ', isCorrect: i % 4 === 1 },
+          { text: 'বিকল্প গ', isCorrect: i % 4 === 2 },
+          { text: 'বিকল্প ঘ', isCorrect: i % 4 === 3 },
+        ],
+        explanation: 'ব্যাখ্যা',
+      }));
+    }
+
+    await supabase.from('challenges' as any).insert({
+      code,
+      creator_id: user.id,
+      subject_name: subjectName,
+      questions: qs,
+    });
+
+    setChallengeLoading(false);
+    const link = `${window.location.origin}/challenge/${code}`;
+    const whatsappMsg = `আমি তোমাকে ${subjectName} MCQ তে চ্যালেঞ্জ করছি! ১০টি প্রশ্নে আমার score beat করতে পারবে? এখানে click করো: ${link}`;
+    
+    toast({
+      title: '⚔️ চ্যালেঞ্জ তৈরি হয়েছে!',
+      description: 'লিংক কপি হয়েছে। বন্ধুকে পাঠাও!',
+    });
+    navigator.clipboard.writeText(link);
+    window.open(`https://wa.me/?text=${encodeURIComponent(whatsappMsg)}`, '_blank');
   };
 
   if (step === 'quiz' && questions.length > 0) {
@@ -180,8 +259,8 @@ const MCQPage: React.FC = () => {
                 let bg = 'bg-muted hover:bg-muted/80 card-hover';
                 let bounceClass = '';
                 if (selectedAnswer !== null) {
-                  if (idx === correctIdx) { bg = 'bg-success/20 border-success'; bounceClass = 'animate-answer-bounce'; }
-                  else if (idx === selectedAnswer && !opt.isCorrect) { bg = 'bg-destructive/20 border-destructive'; bounceClass = 'animate-answer-bounce'; }
+                  if (idx === correctIdx) { bg = 'bg-green-500/20 border-green-500'; bounceClass = 'animate-answer-bounce'; }
+                  else if (idx === selectedAnswer && !opt.isCorrect) { bg = 'bg-red-500/20 border-red-500'; bounceClass = 'animate-answer-bounce'; }
                 }
                 return (
                   <button key={idx} onClick={() => handleAnswer(idx)} disabled={selectedAnswer !== null}
@@ -191,6 +270,11 @@ const MCQPage: React.FC = () => {
                   </button>
                 );
               })}
+            </div>
+            {/* Action buttons below question */}
+            <div className="flex items-center gap-2 mt-4 text-xs">
+              <Button variant="ghost" size="sm" onClick={handleBookmarkQuestion}><Bookmark className="h-4 w-4 mr-1" /> বুকমার্ক</Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowErrorReport(true)}>⚠️ সমস্যা আছে</Button>
             </div>
           </CardContent>
         </Card>
@@ -212,6 +296,8 @@ const MCQPage: React.FC = () => {
             {currentQ + 1 >= questions.length ? 'ফলাফল দেখো' : 'পরের প্রশ্ন →'}
           </Button>
         )}
+        <ErrorReportModal open={showErrorReport} onClose={() => setShowErrorReport(false)}
+          questionText={q.question} subject={subjects.find(s => s.id === selectedSubject)?.name_bn} />
       </div>
     );
   }
@@ -226,12 +312,19 @@ const MCQPage: React.FC = () => {
             <h2 className="text-2xl font-bold mb-2">তোমার স্কোর</h2>
             <p className="text-4xl font-bold text-primary">{score}/{questions.length}</p>
             <p className="text-lg text-muted-foreground">({pct}%)</p>
+            <p className="text-sm text-primary mt-2">+{score * 10 + (questions.length - score) * 5} XP অর্জিত! 🎯</p>
           </CardContent>
         </Card>
         <div className="flex gap-3">
           <Button className="flex-1 btn-ripple" onClick={() => { setStep('select'); setQuestions([]); }}>অন্য বিষয় পড়ো</Button>
           <Button variant="outline" className="flex-1 btn-ripple" onClick={startQuiz}>আবার চেষ্টা করো</Button>
         </div>
+        <Button variant="outline" className="w-full" onClick={() => {
+          const text = `আমি Admission AI তে ${subjects.find(s => s.id === selectedSubject)?.name_bn} MCQ তে ${score}/${questions.length} পেয়েছি! তুমিও চেষ্টা করো!`;
+          window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + window.location.origin)}`, '_blank');
+        }}>
+          📤 WhatsApp এ Share করো
+        </Button>
       </div>
     );
   }
@@ -297,9 +390,14 @@ const MCQPage: React.FC = () => {
       )}
 
       {selectedSubject && (
-        <Button className="w-full btn-ripple" size="lg" onClick={startQuiz} disabled={loading}>
-          {loading ? <ThinkingDots /> : 'শুরু করো 🚀'}
-        </Button>
+        <>
+          <Button className="w-full btn-ripple" size="lg" onClick={startQuiz} disabled={loading}>
+            {loading ? <ThinkingDots /> : 'শুরু করো 🚀'}
+          </Button>
+          <Button variant="outline" className="w-full" size="lg" onClick={handleChallenge} disabled={challengeLoading}>
+            {challengeLoading ? <ThinkingDots /> : <><Swords className="h-5 w-5 mr-2" /> ⚔️ বন্ধুকে চ্যালেঞ্জ করো</>}
+          </Button>
+        </>
       )}
 
       <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} />
