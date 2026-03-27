@@ -13,7 +13,7 @@ import {
   faSquareRootVariable, faEye, faFilePdf, faComments, faSparkles,
   faChevronRight, faChevronDown, faArrowRight, faArrowLeft,
   faCircleInfo, faHandshake, faXmark, faFileLines, faPaperPlane,
-  faImage, faUpload, faLink, faUserShield, faChartPie, faListCheck,
+  faImage, faUpload, faLink, faUserShield, faChartPie, faListCheck, faWandSparkles,
   faUserTie, faEnvelope, faPhone, faMapPin, faBarsProgress,
   faSquarePollVertical, faChartSimple, faPercent, faStopwatch, faFileExport
 } from '@fortawesome/free-solid-svg-icons';
