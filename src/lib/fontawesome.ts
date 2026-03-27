@@ -10,7 +10,7 @@ import {
   faRotate, faClipboard, faChartLine, faDice, faFlag, faGlobe, faGift,
   faMoon, faMoneyBill, faCircle, faCheck, faCircleCheck, faCircleXmark,
   faTrash, faUsers, faRocket, faWandMagicSparkles, faFlask, faSeedling,
-  faSquareRootVariable, faEye, faFilePdf, faComments, faSparkles,
+  faSquareRootVariable, faEye, faFilePdf, faComments,
   faChevronRight, faChevronDown, faArrowRight, faArrowLeft,
   faCircleInfo, faHandshake, faXmark, faFileLines, faPaperPlane,
   faImage, faUpload, faLink, faUserShield, faChartPie, faListCheck, faWandSparkles,
